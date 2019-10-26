@@ -13,10 +13,10 @@ def swap_vec3_format(vectors, swap_back = False):
         swapped = []
 
         for i in range(0, len(vectors[0])):
+
             vec = np.zeros(shape=[4,1])
             vec[0], vec[1], vec[2] = vectors[0][i], vectors[1][i], vectors[2][i]
             vec[3] = 1
-
             swapped.append(vec)
 
 
@@ -26,7 +26,6 @@ def swap_vec3_format(vectors, swap_back = False):
         for i in range(0, len(vectors)):
 
             vec = vectors[i]
-
             swapped[0][i], swapped[1][i], swapped[2][i] = vec[0], vec[1], vec[2]
 
     return swapped
@@ -36,8 +35,7 @@ def affine_transform(points_source, points_target, iterations = 1, scale = True)
 
     S = swap_vec3_format(points_source)
     T = swap_vec3_format(points_target)
-
-
+    
     M = external.affine_matrix_from_points(S, T, shear=False, scale=scale, usesvd=True)
 
     return M

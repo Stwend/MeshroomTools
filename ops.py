@@ -1,6 +1,4 @@
 import bpy
-import numpy as np
-import math
 from mathutils import Matrix, Vector
 from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d, region_2d_to_location_3d
 from . import uv, align, glob, external
@@ -67,6 +65,10 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
                 target['AnchorName'] = "NONE"
                 target['AnchorSide'] = 1
                 target['AnchorsLocked'] = False
+
+                #setting the default will automatically set the parameters of the active object, too, additionally it will set the GUI checkboxes
+                context.scene.mr_anchor_current_mirror = context.scene.mr_anchor_default_mirror
+                context.scene.mr_anchor_current_align = context.scene.mr_anchor_default_align
 
                 loc = ray_info[1] @ m + self.parent.location
                 target.parent = self.grp
@@ -383,16 +385,29 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
 
         obj = context.object
 
-        if obj.get("AnchorGroup", None) is None:
-            self.report({'ERROR'}, "Active Object has no anchors and cannot be locked.")
+        isLocked = context.object.get("AnchorsLocked", False)
+        isAnchor = context.object.get("AlignmentAnchor", False)
+        isObject = not isAnchor and context.object.get("AnchorGroup", False)
+
+        if not isObject and not isAnchor:
+            self.report({'ERROR'}, "Object not eligible.")
             return {'CANCELLED'}
 
-        desiredLockState = not obj.get('AnchorsLocked', False)
+        desiredLockState = not isLocked
 
-        toggle.append(obj)
+        if isObject:
+            toggle.append(obj)
+            for a in context.view_layer.objects[obj['AnchorGroup']].children:
+                    toggle.append(a)
 
-        for a in context.view_layer.objects[obj['AnchorGroup']].children:
-                toggle.append(a)
+        else:
+            p = obj.parent.parent
+            toggle.append(p)
+            for a in context.view_layer.objects[p['AnchorGroup']].children:
+                    toggle.append(a)
+
+
+
 
         for obj in toggle:
             obj['AnchorsLocked'] = desiredLockState
@@ -403,3 +418,31 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
+
+    bl_idname = "mr.linkbtn"
+    bl_label = "Copy Attributes"
+
+    def execute(self, context):
+
+        sel = context.selected_objects
+        source = None
+        target = context.object
+
+        for s in sel:
+            if s.get("AlignmentAnchor", False):
+                source = s
+                break
+
+        if source is None:
+            self.report({'ERROR'}, "No anchor selected as source object.")
+            return {'CANCELLED'}
+
+        target["AnchorName"] = source["AnchorName"]
+        target["AnchorSide"] = source["AnchorSide"]
+        if not source.get("AnchorUseMirror", None) is None:
+            target["AnchorUseMirror"] = source["AnchorUseMirror"]
+        if not source.get("AnchorUseAlign", None) is None:
+            target["AnchorUseAlign"] = source["AnchorUseAlign"]
+
+        return {'FINISHED'}
