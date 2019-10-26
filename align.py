@@ -2,7 +2,6 @@ import bpy
 import math
 from mathutils import Vector, Matrix
 import numpy as np
-from . import preferences
 
 from . import external, glob
 from .glob import Bucket, BucketItem
@@ -45,9 +44,6 @@ def affine_transform(points_source, points_target, iterations = 1, scale = True)
 
 
 def unify_targets(target_objects, context):
-
-    prefs = preferences.getPreferences()
-    bias = prefs.pref_confidence_bias
 
     buckets = []
 
@@ -214,14 +210,14 @@ def flatten_anchors(anchors, context):
 
 def align_mirrored(obj_source, self, context):
 
-    grp = context.view_layer.objects[obj_source['AnchorGroup']]
     obj_source.rotation_mode = 'QUATERNION'
 
     anchors_source = []
 
     for a in context.view_layer.objects[obj_source['AnchorGroup']].children:
-        if not a['AnchorName'] == 'NONE':
-            anchors_source.append(a)
+        if not a.get('AnchorName', "NONE") == "NONE":
+            if bool(a.get('AnchorUseMirror', True)):
+                anchors_source.append(a)
 
     flattened = flatten_anchors(anchors_source, context)
 
@@ -253,15 +249,9 @@ def align_mirrored(obj_source, self, context):
 
     obj_source.matrix_world = transform @ obj_source.matrix_world
 
-    old = obj_source.matrix_world
-
-    context.view_layer.objects.active = obj_source
-
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    grp.matrix_world = old @ grp.matrix_basis
-
     glob.collect_garbage(context)
+
+    obj_source.select_set(True)
 
 
 

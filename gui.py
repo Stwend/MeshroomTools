@@ -49,47 +49,38 @@ class RENDER_PT_MRAlignPanel(Panel):
     def draw(self, context):
 
         layout = self.layout
-
-        layout.separator()
+        r = layout.row()
+        r.alignment = "LEFT"
+        l = context.object.get("AnchorsLocked", False)
+        r.operator("mr.togglelockbtn", text=context.object.name, icon=("LOCKED" if l else "UNLOCKED"), emboss=False)
         layout.operator("mr.addanchor", text="Add Anchor")
-        layout.separator()
-        b = layout.box()
-        b.operator("mr.alignmirrored", text="Align Mirrored")
-        b = layout.box()
-        b.prop(context.scene, "mr_respect_mirrored", text="Mirrored")
-        b.operator("mr.alignanchors", text="Align Anchors")
 
         a = context.view_layer.objects.active
         n = a.get("AnchorName", None)
-        o = a.get("AnchorGroup", None)
 
         if not n == None and a.select_get():
 
             s = a.get("AnchorSide", 1)
-            c = a.get("AnchorConfidence", 1)
 
-            layout.separator()
-            layout.label(text="Anchor")
             b = layout.box()
             r_name = b.row()
             r_name.prop(a, '["AnchorName"]', text="Name")
-            layout.separator()
-            r_btnl = b.row()
-            r_btnl.label(text="Side:")
             r_btn = b.row(align=True)
             r_btn.operator("mr.sidebutton_l", depress=s == 0)
             r_btn.operator("mr.sidebutton_c", depress=s == 1)
             r_btn.operator("mr.sidebutton_r", depress=s == 2)
+            r_usage = b.row()
+            r_usage.prop(context.scene, "mr_anchor_current_mirror", text="Mirroring")
+            r_align = b.row()
+            r_align.prop(context.scene, "mr_anchor_current_align", text="Aligning")
 
-            layout.separator()
 
-        elif not o == None and a.select_get():
-
-            l = a.get("AnchorsLocked")
-
-            b = layout.box()
-            r_lock = b.row(align=True)
-            r_lock.operator("mr.lockbutton")
-            r_lock.operator("mr.unlockbutton")
+        layout.separator()
+        layout.label(text="Mirror")
+        layout.operator("mr.alignmirrored", text="Align Mirrored")
+        layout.separator()
+        layout.label(text="Align")
+        layout.prop(context.scene, "mr_respect_mirrored", text="Mirrored")
+        layout.operator("mr.alignanchors", text="Align Anchors")
 
 

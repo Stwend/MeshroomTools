@@ -2,7 +2,7 @@ import bpy
 
 
 
-from . import gui, ops, glob, preferences
+from . import gui, ops, glob
 
 
 
@@ -21,6 +21,10 @@ bl_info = {
 def initialize_props():
     bpy.types.Scene.mr_pack_res = bpy.props.IntProperty(default=4096, min=1)
     bpy.types.Scene.mr_respect_mirrored = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.mr_anchor_default_mirror = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.mr_anchor_default_align = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.mr_anchor_current_mirror = bpy.props.BoolProperty(default=True, update=lambda self, context: glob.update_prop(context, "mr_anchor_current_mirror", "AnchorUseMirror"))
+    bpy.types.Scene.mr_anchor_current_align = bpy.props.BoolProperty(default=True, update=lambda self, context: glob.update_prop(context, "mr_anchor_current_align", "AnchorUseAlign"))
 
     side_enums = [("LEFT", "Left", "Left"), ("CENTER", "Center", "Center"), ("RIGHT", "Right", "Right")]
     bpy.types.Scene.mr_current_side = bpy.props.EnumProperty(items=side_enums, default="CENTER",
@@ -40,9 +44,7 @@ classes = (gui.RENDER_PT_MRmainPanel,
            ops.OBJECT_OT_MRSideBtnCenter,
            ops.OBJECT_OT_MRSideBtnLeft,
            ops.OBJECT_OT_MRSideBtnRight,
-           ops.OBJECT_OT_MRLockBtn,
-           ops.OBJECT_OT_MRUnlockBtn,
-           preferences.MeshroomTools
+           ops.OBJECT_OT_MRToggleLockBtn
            )
 
 

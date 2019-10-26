@@ -5,6 +5,8 @@ from mathutils import Matrix, Vector
 from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d, region_2d_to_location_3d
 from . import uv, align, glob, external
 
+
+
 class OBJECT_OT_MRuvpack(bpy.types.Operator):
 
     bl_idname = "mr.uvpack"
@@ -213,7 +215,8 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
 
             for a in context.view_layer.objects[obj_source['AnchorGroup']].children:
                 if not a['AnchorName'] == 'NONE':
-                    anchors_source.append(a)
+                    if bool(a.get('AnchorUseAlign', True)):
+                        anchors_source.append(a)
 
 
             for obj_target in obj_targets:
@@ -330,8 +333,6 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
 
             align.align_mirrored(obj_source, self, context)
 
-        context.view_layer.objects.active = objs_source[-1]
-
         return {'FINISHED'}
 
 
@@ -371,57 +372,33 @@ class OBJECT_OT_MRSideBtnRight(OBJECT_OT_MRSideBtn):
     side = 2
 
 
-class OBJECT_OT_MRUnlockBtn(bpy.types.Operator):
 
-    bl_idname = "mr.unlockbutton"
-    bl_label = "Unlock"
-
-    def execute(self, context):
-
-        mobilize = []
-
-        objs = context.selected_objects
-        for obj in objs:
-            if not obj.get('AnchorsLocked', None) is None:
-
-                obj['AnchorsLocked'] = False
-                mobilize.append(obj)
-
-                for a in context.view_layer.objects[obj['AnchorGroup']].children:
-                    a['AnchorsLocked'] = False
-                    mobilize.append(a)
-
-        for obj in mobilize:
-            obj.lock_location = (False, False, False)
-            obj.lock_rotation = (False, False, False)
-            obj.lock_scale = (False, False, False)
-
-        return {'FINISHED'}
-
-
-class OBJECT_OT_MRLockBtn(bpy.types.Operator):
-    bl_idname = "mr.lockbutton"
+class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
+    bl_idname = "mr.togglelockbtn"
     bl_label = "Lock"
 
     def execute(self, context):
 
-        immobilize = []
+        toggle = []
 
-        objs = context.selected_objects
-        for obj in objs:
-            if not obj.get('AnchorsLocked', None) is None:
+        obj = context.object
 
-                obj['AnchorsLocked'] = True
-                immobilize.append(obj)
+        if obj.get("AnchorGroup", None) is None:
+            self.report({'ERROR'}, "Active Object has no anchors and cannot be locked.")
+            return {'CANCELLED'}
 
-                for a in context.view_layer.objects[obj['AnchorGroup']].children:
-                    a['AnchorsLocked'] = True
-                    immobilize.append(a)
+        desiredLockState = not obj.get('AnchorsLocked', False)
 
-        for obj in immobilize:
-            obj.lock_location = (True, True, True)
-            obj.lock_rotation = (True, True, True)
-            obj.lock_scale = (True, True, True)
+        toggle.append(obj)
+
+        for a in context.view_layer.objects[obj['AnchorGroup']].children:
+                toggle.append(a)
+
+        for obj in toggle:
+            obj['AnchorsLocked'] = desiredLockState
+            obj.lock_location = (desiredLockState, desiredLockState, desiredLockState)
+            obj.lock_rotation = (desiredLockState, desiredLockState, desiredLockState)
+            obj.lock_scale = (desiredLockState, desiredLockState, desiredLockState)
 
 
         return {'FINISHED'}
