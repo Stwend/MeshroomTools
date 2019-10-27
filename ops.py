@@ -343,7 +343,7 @@ class OBJECT_OT_MRSideBtn(bpy.types.Operator):
     bl_idname = "mr.sidebutton"
     bl_label = "side"
 
-    side = "None"
+    side = bpy.props.IntProperty(default=1)
 
     def execute(self, context):
 
@@ -351,27 +351,6 @@ class OBJECT_OT_MRSideBtn(bpy.types.Operator):
         obj['AnchorSide'] = self.side
 
         return {'FINISHED'}
-
-
-class OBJECT_OT_MRSideBtnCenter(OBJECT_OT_MRSideBtn):
-    bl_idname = "mr.sidebutton_c"
-    bl_label = "Center"
-
-    side = 1
-
-
-class OBJECT_OT_MRSideBtnLeft(OBJECT_OT_MRSideBtn):
-    bl_idname = "mr.sidebutton_l"
-    bl_label = "Left"
-
-    side = 0
-
-
-class OBJECT_OT_MRSideBtnRight(OBJECT_OT_MRSideBtn):
-    bl_idname = "mr.sidebutton_r"
-    bl_label = "Right"
-
-    side = 2
 
 
 
@@ -407,8 +386,6 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
                     toggle.append(a)
 
 
-
-
         for obj in toggle:
             obj['AnchorsLocked'] = desiredLockState
             obj.lock_location = (desiredLockState, desiredLockState, desiredLockState)
@@ -421,7 +398,7 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
 class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
 
     bl_idname = "mr.linkbtn"
-    bl_label = "Copy Attributes"
+    bl_label = "Copy From Selected"
 
     def execute(self, context):
 
@@ -446,3 +423,41 @@ class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
             target["AnchorUseAlign"] = source["AnchorUseAlign"]
 
         return {'FINISHED'}
+
+
+
+class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
+
+    bl_idname = "mr.selectbtn"
+    bl_label = ""
+
+
+    # 0=Select Group
+    mode = bpy.props.IntProperty(default=0)
+
+
+    def execute(self, context):
+
+        isAnchor = context.object.get("AlignmentAnchor", False)
+        isObject = not isAnchor and context.object.get("AnchorGroup", False)
+
+        if not (isAnchor or isObject):
+            return {'FINISHED'}
+
+        #Select Group
+        if self.mode == 0:
+
+            if isObject:
+                unaffected = [context.object]
+                unaffected.extend(t for t in context.view_layer.objects[context.object["AnchorGroup"]].children)
+            else:
+                p = context.object.parent.parent
+                unaffected = [p]
+                unaffected.extend(t for t in context.view_layer.objects[p["AnchorGroup"]].children)
+
+            for o in context.view_layer.objects:
+                o.hide_set(not o in unaffected)
+
+        return {'FINISHED'}
+
+

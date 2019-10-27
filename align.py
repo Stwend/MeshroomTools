@@ -35,7 +35,7 @@ def affine_transform(points_source, points_target, iterations = 1, scale = True)
 
     S = swap_vec3_format(points_source)
     T = swap_vec3_format(points_target)
-    
+
     M = external.affine_matrix_from_points(S, T, shear=False, scale=scale, usesvd=True)
 
     return M

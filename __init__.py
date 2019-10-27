@@ -41,11 +41,9 @@ classes = (gui.RENDER_PT_MRmainPanel,
            ops.OBJECT_OT_MRAnchorAlign,
            ops.OBJECT_OT_MRAlignMirrored,
            ops.OBJECT_OT_MRSideBtn,
-           ops.OBJECT_OT_MRSideBtnCenter,
-           ops.OBJECT_OT_MRSideBtnLeft,
-           ops.OBJECT_OT_MRSideBtnRight,
            ops.OBJECT_OT_MRToggleLockBtn,
-           ops.OBJECT_OT_MRLinkAttrsBtn
+           ops.OBJECT_OT_MRLinkAttrsBtn,
+           ops.OBJECT_OT_MRSelectBtn
            )
 
 
