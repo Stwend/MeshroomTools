@@ -26,7 +26,7 @@ def ctx():
 
 def update_prop(context, data, propname):
     try:
-        context.view_layer.objects.active[propname] = context.scene[data]
+        context.object[propname] = context.scene[data]
         store(context)
     except:
         pass

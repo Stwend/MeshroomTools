@@ -91,80 +91,6 @@ def unify_targets(target_objects, context):
     return target2
 
 
-def align_prep_mirrored(objects, context):
-
-    ret = []
-
-    buckets = []
-
-    loc = []
-    names = []
-    sides = []
-
-    for anchor in objects:
-
-        n = anchor.get("AnchorName")
-        s = anchor.get("AnchorSide")
-        x = BucketItem(anchor, side=s)
-
-        if len(buckets) == 0:
-            buckets.append(Bucket(n, s, x))
-            continue
-
-        for b in buckets:
-            if b.name == n:
-                b.items.append(x)
-                continue
-
-        buckets.append(Bucket(n, s, x))
-
-
-    for b in buckets:
-
-        if b.side == 1 or not len(b.items) == 2:
-
-            it = b.items[0]
-            loc.append(it.value.matrix_world.translation)
-            names.append(b.name)
-            sides.append(it.side)
-
-        else:
-
-            it1 = b.items[0]
-            it2 = b.items[1]
-
-            p1, p2 = it1.value.matrix_world.translation,  it2.value.matrix_world.translation
-
-            p1m, p2m = Vector((-p1.x, p1.y, p1.z)), Vector((-p2.x, p2.y, p2.z))
-
-            loc.extend([(p1 + p2m) / 2, (p2 + p1m) / 2])
-            names.extend([b.name, b.name])
-            sides.extend([it1.side, it2.side])
-
-
-    for i in range(0, len(loc)):
-
-        l = loc[i]
-        n = names[i]
-        s = sides[i]
-
-        bpy.ops.object.empty_add(type='PLAIN_AXES', radius=1.0, align='WORLD', location=l,
-                                 rotation=(0.0, 0.0, 0.0))
-        temp = context.view_layer.objects.active
-
-        temp["AnchorName"] = n
-        temp["AnchorSide"] = s
-
-        glob.tag_garbage(temp)
-
-        ret.append(temp)
-
-    return ret
-
-
-
-
-
 def flatten_anchors(anchors, context):
 
     buckets = []
@@ -207,6 +133,8 @@ def flatten_anchors(anchors, context):
 
 
 def align_mirrored(obj_source, self, context):
+
+
 
     obj_source.rotation_mode = 'QUATERNION'
 

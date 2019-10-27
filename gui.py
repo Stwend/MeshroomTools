@@ -1,3 +1,4 @@
+import bpy
 from bpy.types import Panel
 
 ###--PANELS--###
@@ -74,9 +75,6 @@ class RENDER_PT_MRAlignPanel(Panel):
                     mainColumn.label(text="OBJECT LOCKED")
 
                 else:
-                    r = mainColumn.row()
-                    r.prop(context.scene, "mr_anchor_default_mirror", text="Mirroring")
-                    r.prop(context.scene, "mr_anchor_default_align", text="Aligning")
                     mainColumn.operator("mr.addanchor", text="Add Anchor")
 
                     mainColumn.separator()
@@ -84,7 +82,6 @@ class RENDER_PT_MRAlignPanel(Panel):
                     mainColumn.operator("mr.alignmirrored", text="Align Mirrored")
                     mainColumn.separator()
                     mainColumn.label(text="Align")
-                    mainColumn.prop(context.scene, "mr_respect_mirrored", text="Mirrored")
                     mainColumn.operator("mr.alignanchors", text="Align Anchors")
 
 
@@ -107,9 +104,7 @@ class RENDER_PT_MRAlignPanel(Panel):
                     center.side = 1
                     right = r_btn.operator("mr.sidebutton", text="Right", depress=s == 2)
                     right.side = 2
-                    r_usage = mainColumn.row()
-                    r_usage.prop(context.scene, "mr_anchor_current_mirror", text="Mirroring")
-                    r_usage.prop(context.scene, "mr_anchor_current_align", text="Aligning")
+
                     if len(context.selected_objects) == 2:
                         r_copy = mainColumn.row()
                         r_copy.operator("mr.linkbtn", icon="PASTEDOWN")

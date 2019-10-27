@@ -20,11 +20,6 @@ bl_info = {
 #properties
 def initialize_props():
     bpy.types.Scene.mr_pack_res = bpy.props.IntProperty(default=4096, min=1)
-    bpy.types.Scene.mr_respect_mirrored = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.mr_anchor_default_mirror = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.mr_anchor_default_align = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.mr_anchor_current_mirror = bpy.props.BoolProperty(default=True, update=lambda self, context: glob.update_prop(context, "mr_anchor_current_mirror", "AnchorUseMirror"))
-    bpy.types.Scene.mr_anchor_current_align = bpy.props.BoolProperty(default=True, update=lambda self, context: glob.update_prop(context, "mr_anchor_current_align", "AnchorUseAlign"))
 
     side_enums = [("LEFT", "Left", "Left"), ("CENTER", "Center", "Center"), ("RIGHT", "Right", "Right")]
     bpy.types.Scene.mr_current_side = bpy.props.EnumProperty(items=side_enums, default="CENTER",
@@ -43,7 +38,7 @@ classes = (gui.RENDER_PT_MRmainPanel,
            ops.OBJECT_OT_MRSideBtn,
            ops.OBJECT_OT_MRToggleLockBtn,
            ops.OBJECT_OT_MRLinkAttrsBtn,
-           ops.OBJECT_OT_MRSelectBtn
+           ops.OBJECT_OT_MRSelectBtn,
            )
 
 

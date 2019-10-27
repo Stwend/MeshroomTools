@@ -66,10 +66,6 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
                 target['AnchorSide'] = 1
                 target['AnchorsLocked'] = False
 
-                #setting the default will automatically set the parameters of the active object, too, additionally it will set the GUI checkboxes
-                context.scene.mr_anchor_current_mirror = context.scene.mr_anchor_default_mirror
-                context.scene.mr_anchor_current_align = context.scene.mr_anchor_default_align
-
                 loc = ray_info[1] @ m + self.parent.location
                 target.parent = self.grp
                 target.matrix_world = Matrix.Translation(loc)
@@ -208,9 +204,6 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
         for obj_source in objs_source:
             obj_source.rotation_mode = 'QUATERNION'
 
-            if context.scene.mr_respect_mirrored:
-                align.align_mirrored(obj_source, self, context)
-
 
             anchors_source = []
             anchors_target = []
@@ -229,13 +222,6 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
             #process target anchors, unify duplicates
             anchors_target = align.unify_targets(anchors_target, context)
             anchors_combined = []
-
-            if context.scene.mr_respect_mirrored:
-
-                anchors_source = align.align_prep_mirrored(anchors_source, context)
-                anchors_target = align.align_prep_mirrored(anchors_target, context)
-
-
 
             for a in anchors_source:
                 n = a['AnchorName']
