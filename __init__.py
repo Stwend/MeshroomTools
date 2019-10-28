@@ -20,6 +20,7 @@ bl_info = {
 #properties
 def initialize_props():
     bpy.types.Scene.mr_pack_res = bpy.props.IntProperty(default=4096, min=1)
+    bpy.types.Scene.mr_mirror_preview = bpy.props.BoolProperty(default=True)
 
     side_enums = [("LEFT", "Left", "Left"), ("CENTER", "Center", "Center"), ("RIGHT", "Right", "Right")]
     bpy.types.Scene.mr_current_side = bpy.props.EnumProperty(items=side_enums, default="CENTER",
@@ -39,6 +40,7 @@ classes = (gui.RENDER_PT_MRmainPanel,
            ops.OBJECT_OT_MRToggleLockBtn,
            ops.OBJECT_OT_MRLinkAttrsBtn,
            ops.OBJECT_OT_MRSelectBtn,
+           ops.OBJECT_OT_MRTogglePreviewBtn
            )
 
 

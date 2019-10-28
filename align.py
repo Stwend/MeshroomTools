@@ -134,8 +134,6 @@ def flatten_anchors(anchors, context):
 
 def align_mirrored(obj_source, self, context):
 
-
-
     obj_source.rotation_mode = 'QUATERNION'
 
     anchors_source = []
@@ -175,10 +173,34 @@ def align_mirrored(obj_source, self, context):
 
     obj_source.matrix_world = transform @ obj_source.matrix_world
 
+    obj_prev_name = obj_source.get('MirrorPreview', None)
+    if not obj_prev_name is None:
+        try:
+            to_delete = context.view_layer.objects[obj_prev_name]
+            glob.tag_garbage(to_delete)
+        except:
+            pass
+
     glob.collect_garbage(context)
 
-    obj_source.select_set(True)
+    if(context.scene.mr_mirror_preview):
 
+        bpy.ops.object.select_all(action='DESELECT')
+
+        bpy.ops.object.duplicate({"object": obj_source, "selected_objects": [obj_source]}, linked=False)
+        obj_prev = context.object
+        obj_source['MirrorPreview'] = obj_prev.name
+        bpy.ops.object.transform_apply({"object": obj_prev, "selected_objects": [obj_prev]}, location=True, rotation=True, scale=True)
+        obj_prev.scale.x = -1.0
+        obj_prev.select_set(False)
+        obj_prev.hide_select = True
+
+
+
+
+
+    context.view_layer.objects.active = obj_source
+    obj_source.select_set(True)
 
 
 

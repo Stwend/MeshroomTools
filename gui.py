@@ -47,10 +47,15 @@ class RENDER_PT_MRAlignPanel(Panel):
 
         layout = self.layout
 
-        isSelected = context.object.select_get()
-        isLocked = context.object.get("AnchorsLocked", False)
-        isAnchor = context.object.get("AlignmentAnchor", False)
-        isObject = not isAnchor and context.object.get("AnchorGroup", False)
+        if not context.object is None:
+            isSelected = context.object.select_get()
+            isLocked = context.object.get("AnchorsLocked", False)
+            isAnchor = context.object.get("AlignmentAnchor", False)
+            isObject = not isAnchor and context.object.get("AnchorGroup", False)
+            isHaveMirror = isObject and context.object.get("MirrorPreview", False)
+            isMirrorHidden = isHaveMirror and context.object.get("MirrorHidden", False)
+        else:
+            isSelected, isLocked, isAnchor, isObject, isHaveMirror, isMirrorHidden = False, False, False, False, False, False
 
         mainColumn = layout.column()
         mainColumn.active = not isLocked
@@ -66,10 +71,12 @@ class RENDER_PT_MRAlignPanel(Panel):
             rowOpt = spl.row()
             rowOpt.alignment = "RIGHT"
             rowOpt.operator("mr.togglelockbtn", text="", icon=("LOCKED" if isLocked else "UNLOCKED"), emboss=False)
+            if isHaveMirror:
+                rowOpt.operator("mr.togglepreviewbtn", text="", icon="HIDE_ON" if isMirrorHidden else "HIDE_OFF", emboss=False)
             op_isolate = rowOpt.operator("mr.selectbtn", text="", icon="MESH_CUBE" if isObject else "EMPTY_AXIS", emboss=False)
             op_isolate.mode = 0
 
-            if isObject:
+            if not isAnchor:
 
                 if isLocked:
                     mainColumn.label(text="OBJECT LOCKED")
@@ -79,6 +86,7 @@ class RENDER_PT_MRAlignPanel(Panel):
 
                     mainColumn.separator()
                     mainColumn.label(text="Mirror")
+                    mainColumn.prop(context.scene, "mr_mirror_preview", text="Preview")
                     mainColumn.operator("mr.alignmirrored", text="Align Mirrored")
                     mainColumn.separator()
                     mainColumn.label(text="Align")
@@ -86,7 +94,7 @@ class RENDER_PT_MRAlignPanel(Panel):
 
 
 
-            elif isAnchor:
+            else:
 
                 if isLocked:
                     mainColumn.label(text="ANCHOR LOCKED")

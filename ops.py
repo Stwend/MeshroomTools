@@ -447,3 +447,29 @@ class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class OBJECT_OT_MRTogglePreviewBtn(bpy.types.Operator):
+
+    bl_idname = "mr.togglepreviewbtn"
+    bl_label = ""
+
+
+    def execute(self, context):
+
+        mirror_name = context.object.get("MirrorPreview", None)
+        isValid = not (context.object.get("AlignmentAnchor", False) or mirror_name is None)
+
+        if isValid:
+
+            try:
+                obj_mirror = context.view_layer.objects[mirror_name]
+            except:
+                return {'FINISHED'}
+                pass
+
+            obj_mirror.hide_viewport = not obj_mirror.hide_viewport
+            context.object["MirrorHidden"] = obj_mirror.hide_viewport
+
+
+        return {'FINISHED'}
+
+
