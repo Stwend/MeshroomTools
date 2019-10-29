@@ -1,10 +1,9 @@
 import bpy
-import math
 from mathutils import Vector, Matrix
 import numpy as np
 
-from . import external, glob
-from .glob import Bucket, BucketItem
+from misc import global_functions, external
+from .classes import Bucket, BucketItem
 
 def swap_vec3_format(vectors, swap_back = False):
 
@@ -84,7 +83,7 @@ def unify_targets(target_objects, context):
         temp["AnchorName"] = b.name
         temp["AnchorSide"] = b.side
 
-        glob.tag_garbage(temp)
+        global_functions.tag_garbage(temp)
 
         target2.append(temp)
 
@@ -174,11 +173,11 @@ def align_mirrored(obj_source, self, context):
     if not obj_prev_name is None:
         try:
             to_delete = context.view_layer.objects[obj_prev_name]
-            glob.tag_garbage(to_delete)
+            global_functions.tag_garbage(to_delete)
         except:
             pass
 
-    glob.collect_garbage(context)
+    global_functions.collect_garbage(context)
 
     if(context.scene.mr_mirror_preview):
 

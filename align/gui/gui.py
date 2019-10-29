@@ -1,43 +1,11 @@
-import bpy
 from bpy.types import Panel
 
-###--PANELS--###
-
-class RENDER_PT_MRmainPanel(Panel):
-    bl_idname = "mr.panel._PT_main"
-    bl_label = "Meshroom"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "Meshroom"
-
-    def draw(self, context):
-        return
-
-
-class RENDER_PT_MRUVPanel(Panel):
-    bl_idname = "mr.panel._PT_uv"
-    bl_label = "UV/Texture"
-    bl_parent_id = "mr.panel._PT_main"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "Meshroom"
-
-    def draw(self, context):
-        layout = self.layout
-
-        box = layout.split(factor=0.5)
-        box.label(text="Resolution:")
-
-        box.prop(context.scene, "mr_pack_res", text="")
-
-        layout.operator("mr.uvpack", text="Pack")
 
 
 
 class RENDER_PT_MRAlignPanel(Panel):
     bl_idname = "mr.panel._PT_align"
     bl_label = "Align"
-    bl_parent_id = "mr.panel._PT_main"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Meshroom"

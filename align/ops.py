@@ -1,24 +1,9 @@
 import bpy
-from mathutils import Matrix, Vector
-from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d, region_2d_to_location_3d
-from . import uv, align, glob, external
+from mathutils import Matrix
+from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d
 
-
-
-class OBJECT_OT_MRuvpack(bpy.types.Operator):
-
-    bl_idname = "mr.uvpack"
-    bl_label = "Pack UVs"
-
-    def execute(self, context):
-
-        glob.store(context)
-
-        s = context.view_layer.objects.active
-        uv.packUDIMS(s)
-
-        return {'FINISHED'}
-
+from misc import global_functions, external
+from . import functions
 
 class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
 
@@ -156,9 +141,9 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
 
         if isObject:
             for a in context.view_layer.objects[group].children:
-                glob.tag_garbage(a)
+                global_functions.tag_garbage(a)
 
-            glob.collect_garbage(context)
+            global_functions.collect_garbage(context)
 
             ob.select_set(True)
             context.view_layer.objects.active = ob
@@ -245,7 +230,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
                         anchors_target.append(a)
 
             #process target anchors, unify duplicates
-            anchors_target = align.unify_targets(anchors_target, context)
+            anchors_target = functions.unify_targets(anchors_target, context)
             anchors_combined = []
 
             for a in anchors_source:
@@ -262,7 +247,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
 
             if l < 3:
                 self.report({'ERROR'}, "At least 3 matching and locked anchors are needed.")
-                glob.collect_garbage(context)
+                global_functions.collect_garbage(context)
                 continue
 
             A = []
@@ -274,7 +259,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
                 A.append(anchors_combined[i][0].matrix_world.translation)
                 B.append(anchors_combined[i][1].matrix_world.translation)
 
-            affine = align.affine_transform(A, B, 1)
+            affine = functions.affine_transform(A, B, 1)
 
             transform = Matrix.Identity(4)
             for n in range(0, 4):
@@ -282,7 +267,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
                     transform[n][m] = affine[n][m]
 
             obj_source.matrix_world = transform @ obj_source.matrix_world
-            glob.collect_garbage(context)
+            global_functions.collect_garbage(context)
 
         for o in objs_source:
             o.select_set(True)
@@ -344,164 +329,7 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
 
         for obj_source in objs_source:
 
-            align.align_mirrored(obj_source, self, context)
-
-        return {'FINISHED'}
-
-
-class OBJECT_OT_MRSideBtn(bpy.types.Operator):
-
-    bl_idname = "mr.sidebutton"
-    bl_label = "side"
-
-    side = bpy.props.IntProperty(default=1)
-
-    def execute(self, context):
-
-        obj = context.view_layer.objects.active
-        obj['AnchorSide'] = self.side
-
-        return {'FINISHED'}
-
-
-
-class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
-    bl_idname = "mr.togglelockbtn"
-    bl_label = "Lock"
-
-    def execute(self, context):
-
-        toggle = []
-
-        obj = context.object
-
-        isLocked = context.object.get("AnchorsLocked", False)
-        isAnchor = context.object.get("AlignmentAnchor", False)
-        isObject = not isAnchor and context.object.get("AnchorGroup", False)
-
-        if not isObject and not isAnchor:
-            self.report({'ERROR'}, "Object not eligible.")
-            return {'CANCELLED'}
-
-        desiredLockState = not isLocked
-
-        if isObject:
-            toggle.append(obj)
-            for a in context.view_layer.objects[obj['AnchorGroup']].children:
-                    toggle.append(a)
-
-        else:
-            p = obj.parent.parent
-            toggle.append(p)
-            for a in context.view_layer.objects[p['AnchorGroup']].children:
-                    toggle.append(a)
-
-
-        for obj in toggle:
-            obj['AnchorsLocked'] = desiredLockState
-            obj.lock_location = (desiredLockState, desiredLockState, desiredLockState)
-            obj.lock_rotation = (desiredLockState, desiredLockState, desiredLockState)
-            obj.lock_scale = (desiredLockState, desiredLockState, desiredLockState)
-
-
-        return {'FINISHED'}
-
-class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
-
-    bl_idname = "mr.linkbtn"
-    bl_label = ""
-
-    mirror = bpy.props.BoolProperty(default=False)
-
-    def execute(self, context):
-
-        sel = context.selected_objects
-        source = None
-        target = context.object
-
-        for s in sel:
-            if s.get("AlignmentAnchor", False):
-                source = s
-                break
-
-        if source is None:
-            self.report({'ERROR'}, "No anchor selected as source object.")
-            return {'CANCELLED'}
-
-        target["AnchorName"] = source["AnchorName"]
-
-        if not self.mirror:
-            target["AnchorSide"] = source["AnchorSide"]
-        else:
-            target["AnchorSide"] = abs(source["AnchorSide"] - 2)
-
-        if context.scene.mr_mirror_translate:
-            temp = source.matrix_world.translation.copy()
-            temp.x = -temp.x
-            target.matrix_world.translation = temp
-
-
-        return {'FINISHED'}
-
-
-
-class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
-
-    bl_idname = "mr.selectbtn"
-    bl_label = ""
-
-
-    # 0=Select Group
-    mode = bpy.props.IntProperty(default=0)
-
-
-    def execute(self, context):
-
-        isAnchor = context.object.get("AlignmentAnchor", False)
-        isObject = not isAnchor and context.object.get("AnchorGroup", False)
-
-        if not (isAnchor or isObject):
-            return {'FINISHED'}
-
-        #Select Group
-        if self.mode == 0:
-
-            if isObject:
-                unaffected = [context.object]
-                unaffected.extend(t for t in context.view_layer.objects[context.object["AnchorGroup"]].children)
-            else:
-                p = context.object.parent.parent
-                unaffected = [p]
-                unaffected.extend(t for t in context.view_layer.objects[p["AnchorGroup"]].children)
-
-            for o in context.view_layer.objects:
-                o.hide_set(not o in unaffected)
-
-        return {'FINISHED'}
-
-
-class OBJECT_OT_MRTogglePreviewBtn(bpy.types.Operator):
-
-    bl_idname = "mr.togglepreviewbtn"
-    bl_label = ""
-
-
-    def execute(self, context):
-
-        mirror_name = context.object.get("MirrorPreview", None)
-        isValid = not (context.object.get("AlignmentAnchor", False) or mirror_name is None)
-
-        if isValid:
-
-            try:
-                obj_mirror = context.view_layer.objects[mirror_name]
-            except:
-                return {'FINISHED'}
-                pass
-
-            obj_mirror.hide_set(not obj_mirror.hide_get())
-            context.object["MirrorHidden"] = obj_mirror.hide_get()
-
+            functions.align_mirrored(obj_source, self, context)
 
         return {'FINISHED'}
 

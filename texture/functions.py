@@ -2,15 +2,12 @@ import bpy
 import math
 import os
 
-from . import glob
-
-
-
+from misc import global_functions
 
 
 def packUDIMS(selObj):
 
-    ctx = glob.ctx()
+    ctx = global_functions.ctx()
     bin = []
 
     for o in ctx.scene.objects:
