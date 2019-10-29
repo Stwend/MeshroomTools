@@ -2,7 +2,7 @@ import bpy
 
 
 
-from . import texture, align, misc, importing
+from . import texture, align, _misc, importing
 
 
 
@@ -27,7 +27,7 @@ def register():
     for cls in (classes):
         register_class(cls)
 
-    misc.properties.initialize_props()
+    _misc.properties.initialize_props()
 
 
 def unregister():

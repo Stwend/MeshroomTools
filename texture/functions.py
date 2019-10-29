@@ -2,7 +2,7 @@ import bpy
 import math
 import os
 
-from ..misc import global_functions
+from .._misc import global_functions
 
 
 def packUDIMS(selObj):

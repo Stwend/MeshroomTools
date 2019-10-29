@@ -2,7 +2,7 @@ import bpy
 from mathutils import Vector, Matrix
 import numpy as np
 
-from ..misc import global_functions, external
+from .._misc import global_functions, external
 from .classes import Bucket, BucketItem
 
 def swap_vec3_format(vectors, swap_back = False):
