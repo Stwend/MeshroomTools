@@ -2,7 +2,7 @@ import bpy
 from mathutils import Matrix
 from bpy_extras.view3d_utils import region_2d_to_vector_3d, region_2d_to_origin_3d
 
-from misc import global_functions, external
+from ..misc import global_functions, external
 from . import functions
 
 class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
@@ -140,7 +140,11 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
         isObject = not group is None
 
         if isObject:
-            for a in context.view_layer.objects[group].children:
+
+            grp = context.view_layer.objects[group]
+            global_functions.tag_garbage(grp)
+
+            for a in grp.children:
                 global_functions.tag_garbage(a)
 
             global_functions.collect_garbage(context)

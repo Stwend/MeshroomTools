@@ -30,7 +30,7 @@ class RENDER_PT_MRAlignPanel(Panel):
 
         if isSelected:
 
-            displayName = context.object.name if isObject else context.object["AnchorName"]
+            displayName = context.object.name if not isAnchor else context.object["AnchorName"]
 
             rowInfo = mainColumn.row()
             spl = rowInfo.split(factor=0.5)
@@ -41,7 +41,7 @@ class RENDER_PT_MRAlignPanel(Panel):
             rowOpt.operator("mr.togglelockbtn", text="", icon=("LOCKED" if isLocked else "UNLOCKED"), emboss=False)
             if isHaveMirror:
                 rowOpt.operator("mr.togglepreviewbtn", text="", icon="HIDE_ON" if isMirrorHidden else "HIDE_OFF", emboss=False)
-            op_isolate = rowOpt.operator("mr.selectbtn", text="", icon="MESH_CUBE" if isObject else "EMPTY_AXIS", emboss=False)
+            op_isolate = rowOpt.operator("mr.selectbtn", text="", icon="MESH_CUBE" if not isAnchor else "EMPTY_AXIS", emboss=False)
             op_isolate.mode = 0
 
             if not isAnchor:

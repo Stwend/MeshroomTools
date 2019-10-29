@@ -12,6 +12,7 @@ def collect_garbage(context):
     for obj in context.scene.objects:
         if obj.get("Meshroom_GARBAGE", False):
             obj.hide_set(False)
+            obj.hide_viewport = False
             obj.select_set(True)
 
     bpy.ops.object.delete()
@@ -27,11 +28,3 @@ def store(c):
 
 def ctx():
     return storedContext
-
-
-def update_prop(context, data, propname):
-    try:
-        context.object[propname] = context.scene[data]
-        store(context)
-    except:
-        pass

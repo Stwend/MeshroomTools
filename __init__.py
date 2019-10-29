@@ -2,7 +2,7 @@ import bpy
 
 
 
-from . import texture, align, misc
+from . import texture, align, misc, importing
 
 
 
@@ -20,6 +20,7 @@ def register():
     from bpy.utils import register_class
 
     classes = []
+    classes.extend(importing.get_to_register())
     classes.extend(texture.get_to_register())
     classes.extend(align.get_to_register())
 
@@ -33,6 +34,7 @@ def unregister():
     from bpy.utils import unregister_class
 
     classes = []
+    classes.extend(importing.get_to_register())
     classes.extend(texture.get_to_register())
     classes.extend(align.get_to_register())
 

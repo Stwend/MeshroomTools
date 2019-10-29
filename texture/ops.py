@@ -1,7 +1,7 @@
 import bpy
 
 from . import functions
-from misc import global_functions
+from ..misc import global_functions
 
 
 class OBJECT_OT_MRuvpack(bpy.types.Operator):

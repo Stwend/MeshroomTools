@@ -9,9 +9,20 @@ class RENDER_PT_MRUVPanel(Panel):
     bl_category = "Meshroom"
 
     def draw(self, context):
+
         layout = self.layout
 
-        box = layout.split(factor=0.5)
+        if not context.object is None:
+            is_valid = context.object.material_slots[0].name == 'TextureAtlas_1001'
+        else:
+            is_valid = False
+
+        if not is_valid:
+            layout.active = False
+            layout.label(text="No valid object selected.")
+            return
+
+        box = layout.split(factor=0.33)
         box.label(text="Resolution:")
 
         box.prop(context.scene, "mr_pack_res", text="")
