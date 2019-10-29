@@ -21,6 +21,7 @@ bl_info = {
 def initialize_props():
     bpy.types.Scene.mr_pack_res = bpy.props.IntProperty(default=4096, min=1)
     bpy.types.Scene.mr_mirror_preview = bpy.props.BoolProperty(default=True)
+    bpy.types.Scene.mr_mirror_translate = bpy.props.BoolProperty(default=False)
 
     side_enums = [("LEFT", "Left", "Left"), ("CENTER", "Center", "Center"), ("RIGHT", "Right", "Right")]
     bpy.types.Scene.mr_current_side = bpy.props.EnumProperty(items=side_enums, default="CENTER",
@@ -34,6 +35,7 @@ classes = (gui.RENDER_PT_MRmainPanel,
            gui.RENDER_PT_MRAlignPanel,
            ops.OBJECT_OT_MRuvpack,
            ops.OBJECT_OT_MRAnchorAddModal,
+           ops.OBJECT_OT_MRAnchorClear,
            ops.OBJECT_OT_MRAnchorAlign,
            ops.OBJECT_OT_MRAlignMirrored,
            ops.OBJECT_OT_MRSideBtn,

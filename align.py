@@ -91,10 +91,13 @@ def unify_targets(target_objects, context):
     return target2
 
 
-def flatten_anchors(anchors, context):
 
+
+
+def average_anchors(anchors, context):
     buckets = []
 
+    loc_old = []
     loc = []
 
     for anchor in anchors:
@@ -114,22 +117,30 @@ def flatten_anchors(anchors, context):
 
         buckets.append(Bucket(n, s, x))
 
-
     for b in buckets:
 
         if b.side == 1:
             loc.append(b.items[0].value.matrix_world.translation)
+            loc_old.append(b.items[0].value.matrix_world.translation)
 
         else:
 
             if not len(b.items) < 2:
                 p1, p2 = b.items[0].value.matrix_world.translation,  b.items[1].value.matrix_world.translation
 
-                loc.append((p1 + p2) / 2)
+                p1M, p2M = p1.copy(), p2.copy()
 
+                p1M.x = -p1M.x
+                p2M.x = -p2M.x
 
+                p1New = (p1 + p2M) / 2
+                p2New = (p2 + p1M) / 2
 
-    return loc
+                loc.extend([p1New, p2New])
+                loc_old.extend([p1,p2])
+
+    return [loc_old,loc]
+
 
 
 def align_mirrored(obj_source, self, context):
@@ -140,31 +151,15 @@ def align_mirrored(obj_source, self, context):
 
     for a in context.view_layer.objects[obj_source['AnchorGroup']].children:
         if not a.get('AnchorName', "NONE") == "NONE":
-            if bool(a.get('AnchorUseMirror', True)):
-                anchors_source.append(a)
+            anchors_source.append(a)
 
-    flattened = flatten_anchors(anchors_source, context)
+    avg = average_anchors(anchors_source, context)
 
-    if len(flattened) < 3:
-        self.report({'ERROR'}, "More than 3 mirrored anchors are needed.")
+    if len(avg[0]) < 3:
+        self.report({'ERROR'}, "More than 3 mirrored or centered anchors are needed.")
         return {'CANCELLED'}
 
-    targets = []
-    l = len(flattened)
-    angle = (math.pi * 2) / l
-    current = 0
-
-    for i in range(0, l):
-        c = math.cos(current)
-        s = math.sin(current)
-
-        p = Vector((0.0, -s * 10, c * 10))
-
-        targets.append(p)
-
-        current += angle
-
-    affine = affine_transform(flattened, targets, 1, scale=False)
+    affine = affine_transform(avg[0], avg[1], 1, scale=False)
 
     transform = Matrix.Identity(4)
     for n in range(0, 4):
@@ -172,6 +167,8 @@ def align_mirrored(obj_source, self, context):
             transform[n][m] = affine[n][m]
 
     obj_source.matrix_world = transform @ obj_source.matrix_world
+
+
 
     obj_prev_name = obj_source.get('MirrorPreview', None)
     if not obj_prev_name is None:
@@ -193,7 +190,7 @@ def align_mirrored(obj_source, self, context):
         bpy.ops.object.transform_apply({"object": obj_prev, "selected_objects": [obj_prev]}, location=True, rotation=True, scale=True)
         obj_prev.scale.x = -1.0
         obj_prev.select_set(False)
-        obj_prev.hide_select = True
+        obj_source["MirrorHidden"] = False
 
 
 

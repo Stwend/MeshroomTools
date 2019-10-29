@@ -83,6 +83,7 @@ class RENDER_PT_MRAlignPanel(Panel):
 
                 else:
                     mainColumn.operator("mr.addanchor", text="Add Anchor")
+                    mainColumn.operator("mr.clearanchors", text="Clear Anchors")
 
                     mainColumn.separator()
                     mainColumn.label(text="Mirror")
@@ -115,7 +116,14 @@ class RENDER_PT_MRAlignPanel(Panel):
 
                     if len(context.selected_objects) == 2:
                         r_copy = mainColumn.row()
-                        r_copy.operator("mr.linkbtn", icon="PASTEDOWN")
+                        if not context.selected_objects[0].parent == context.selected_objects[1].parent:
+                            cop = r_copy.operator("mr.linkbtn", text="Copy Attributes", icon="PASTEDOWN")
+                            cop.mirror = False
+                        else:
+                            r_copy_s = r_copy.split(factor=0.33)
+                            r_copy_s.prop(context.scene, "mr_mirror_translate", text="Location")
+                            cop = r_copy_s.operator("mr.linkbtn", text="Copy Mirrored", icon="PASTEDOWN")
+                            cop.mirror = True
 
         else:
             layout.active = False

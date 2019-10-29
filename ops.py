@@ -141,6 +141,31 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
         context.view_layer.objects.active = self.parent
 
 
+class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
+
+    bl_idname = "mr.clearanchors"
+    bl_label = ""
+
+
+    def execute(self, context):
+
+        ob = context.object
+
+        group = context.object.get("AnchorGroup", None)
+        isObject = not group is None
+
+        if isObject:
+            for a in context.view_layer.objects[group].children:
+                glob.tag_garbage(a)
+
+            glob.collect_garbage(context)
+
+            ob.select_set(True)
+            context.view_layer.objects.active = ob
+
+        return {'FINISHED'}
+
+
 class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
 
     bl_idname = "mr.alignanchors"
@@ -384,7 +409,9 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
 class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
 
     bl_idname = "mr.linkbtn"
-    bl_label = "Copy From Selected"
+    bl_label = ""
+
+    mirror = bpy.props.BoolProperty(default=False)
 
     def execute(self, context):
 
@@ -402,11 +429,17 @@ class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
             return {'CANCELLED'}
 
         target["AnchorName"] = source["AnchorName"]
-        target["AnchorSide"] = source["AnchorSide"]
-        if not source.get("AnchorUseMirror", None) is None:
-            target["AnchorUseMirror"] = source["AnchorUseMirror"]
-        if not source.get("AnchorUseAlign", None) is None:
-            target["AnchorUseAlign"] = source["AnchorUseAlign"]
+
+        if not self.mirror:
+            target["AnchorSide"] = source["AnchorSide"]
+        else:
+            target["AnchorSide"] = abs(source["AnchorSide"] - 2)
+
+        if context.scene.mr_mirror_translate:
+            temp = source.matrix_world.translation.copy()
+            temp.x = -temp.x
+            target.matrix_world.translation = temp
+
 
         return {'FINISHED'}
 
@@ -466,8 +499,8 @@ class OBJECT_OT_MRTogglePreviewBtn(bpy.types.Operator):
                 return {'FINISHED'}
                 pass
 
-            obj_mirror.hide_viewport = not obj_mirror.hide_viewport
-            context.object["MirrorHidden"] = obj_mirror.hide_viewport
+            obj_mirror.hide_set(not obj_mirror.hide_get())
+            context.object["MirrorHidden"] = obj_mirror.hide_get()
 
 
         return {'FINISHED'}
