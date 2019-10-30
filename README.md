@@ -3,6 +3,10 @@
 A few useful tools for processing Meshroom scans inside Blender, loosely based on
 https://github.com/patmo141/object_alignment 
 
+
+Currently only Blender 2.8 is supported.
+
+
 ## Table Of Contents
 - [MeshroomTools](#meshroomtools)
   * [Import](#import)
