@@ -10,7 +10,7 @@ https://github.com/patmo141/object_alignment
 
 
 
-![](https://github.com/Stwend/MeshroomTools/__readme_img/import.png) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/import.png) 
 
 
 
@@ -28,13 +28,13 @@ Imports a mesh from your specified Meshroom project. Unless specified otherwise,
 
 ## UV/Texture
 
-![](https://github.com/Stwend/MeshroomTools/__readme_img/texture.png) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/texture.png) 
 
 In case there is no object currently selected or the selected object doesn't have Meshroom UDIMs, this panel will show only the line "No valid object selected".
 
 
 
-![](https://github.com/Stwend/MeshroomTools/__readme_img/texture_active.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/texture_active.PNG) 
 
 If the selected object is deemed valid, the menu appears. Packing will rearrange your existing textures in a suitable grid (e.g. 4 textures in a 2x2 grid, up to 9 textures in a 3x3 grid and so on) and render out a new texture. Your UVs will be rearranged accordingly.
 
@@ -44,7 +44,7 @@ If the selected object is deemed valid, the menu appears. Packing will rearrange
 
 ## Align
 
-![](https://github.com/Stwend/MeshroomTools/__readme_img/align.png) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/align.png) 
 
 In a similar fashion to the UV panel, the Align panel won't show anything until suitable objects have been selected.
 
@@ -52,7 +52,7 @@ In a similar fashion to the UV panel, the Align panel won't show anything until 
 
 ##### Object Panel
 
-![](https://github.com/Stwend/MeshroomTools/__readme_img/align_active_object.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/align_active_object.PNG) 
 
 If an object is selected, regardless of it having anchors or not, this panel appears.
 
@@ -71,7 +71,7 @@ If an object is selected, regardless of it having anchors or not, this panel app
 
 ##### Anchor Panel
 
-![](F:\Bilder\meshroomtools\align_active_anchor.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor.PNG) 
 
 In case you have selected an anchor, this panel will show up.
 
@@ -83,7 +83,7 @@ In case you have selected an anchor, this panel will show up.
 
 
 
-![](F:\Bilder\meshroomtools\align_active_anchor_pair.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor_pair.PNG) 
 
 You can select a pair of anchors, too. In this case the anchor panel will show additional functions:
 
@@ -94,7 +94,7 @@ You can select a pair of anchors, too. In this case the anchor panel will show a
 
 
 
-![](F:\Bilder\meshroomtools\align_active_anchor_pair_2.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor_pair_2.PNG) 
 
 This button will show up if you have selected two anchors and they belong to different objects.
 
