@@ -134,23 +134,23 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
 
     def execute(self, context):
 
-        ob = context.object
+        obj = context.object
 
         group = context.object.get("AnchorGroup", None)
-        isObject = not group is None
+        is_object = not group is None
 
-        if isObject:
+        if is_object:
 
             grp = context.view_layer.objects[group]
             global_functions.tag_garbage(grp)
 
-            for a in grp.children:
-                global_functions.tag_garbage(a)
+            for anchor in grp.children:
+                global_functions.tag_garbage(anchor)
 
             global_functions.collect_garbage(context)
 
-            ob.select_set(True)
-            context.view_layer.objects.active = ob
+            obj.select_set(True)
+            context.view_layer.objects.active = obj
 
         return {'FINISHED'}
 
@@ -169,32 +169,32 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
         is_mesh = context.object.type == 'MESH'
 
 
-        f = False
-        f2 = False
-        for o in context.selected_objects:
-            x = o.get("AnchorGroup", None)
-            if not x is None:
-                f = True
+        found = False
+        found2 = False
+        for obj in context.selected_objects:
+            is_object = obj.get("AnchorGroup", False)
+            if not is_object:
+                found = True
 
-            x = o.get("AnchorsLocked", True)
-            if not x:
-                f2 = True
+            is_locked = obj.get("AnchorsLocked", True)
+            if not is_locked:
+                found2 = True
 
-            if f and f2:
+            if found and found2:
                 break
 
-        if not f:
+        if not found:
             self.report({'ERROR'}, "Selection consists of unknown objects.")
             return {'CANCELLED'}
 
-        source_locked = bool(context.object.get("AnchorsLocked", True))
+        source_is_locked = bool(context.object.get("AnchorsLocked", True))
 
         if not is_mesh:
             self.report({'ERROR'}, "No mesh objects selected.")
             return {'CANCELLED'}
 
 
-        if source_locked:
+        if source_is_locked:
             self.report({'ERROR'}, "Locked objects cannot be aligned.")
             return {'CANCELLED'}
 
@@ -203,17 +203,17 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
 
         objs_source = [o for o in context.selected_objects]
 
-        for o in objs_source:
-            if (o.get("AnchorGroup", None) is None) or (o.get("AnchorsLocked", True)):
-                objs_source.remove(o)
+        for obj in objs_source:
+            if (obj.get("AnchorGroup", None) is None) or (obj.get("AnchorsLocked", True)):
+                objs_source.remove(obj)
 
         obj_targets = []
 
-        for o in context.view_layer.objects:
-            if not o.select_get():
-                if not o.get("AnchorGroup", None) is None:
-                    if o.get("AnchorsLocked", False):
-                        obj_targets.append(o)
+        for obj in context.view_layer.objects:
+            if not obj.select_get():
+                if not obj.get("AnchorGroup", None) is None:
+                    if obj.get("AnchorsLocked", False):
+                        obj_targets.append(obj)
 
         for obj_source in objs_source:
             obj_source.rotation_mode = 'QUATERNION'
@@ -222,15 +222,15 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
             anchors_source = []
             anchors_target = []
 
-            for a in context.view_layer.objects[obj_source['AnchorGroup']].children:
-                if not a['AnchorName'] == 'NONE':
-                    if bool(a.get('AnchorUseAlign', True)):
-                        anchors_source.append(a)
+            for anchor in context.view_layer.objects[obj_source['AnchorGroup']].children:
+                if not anchor['AnchorName'] == 'NONE':
+                    if bool(anchor.get('AnchorUseAlign', True)):
+                        anchors_source.append(anchor)
 
 
             for obj_target in obj_targets:
-                for a in context.view_layer.objects[obj_target['AnchorGroup']].children:
-                    if not a['AnchorName'] == 'NONE':
+                for anchor in context.view_layer.objects[obj_target['AnchorGroup']].children:
+                    if not anchor['AnchorName'] == 'NONE':
                         anchors_target.append(a)
 
             #process target anchors, unify duplicates
@@ -254,16 +254,16 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
                 global_functions.collect_garbage(context)
                 continue
 
-            A = []
-            B = []
+            sources = []
+            targets = []
 
             for i in range(0, l):
 
                 #transform into source space
-                A.append(anchors_combined[i][0].matrix_world.translation)
-                B.append(anchors_combined[i][1].matrix_world.translation)
+                sources.append(anchors_combined[i][0].matrix_world.translation)
+                targets.append(anchors_combined[i][1].matrix_world.translation)
 
-            affine = functions.affine_transform(A, B, 1)
+            affine = functions.affine_transform(sources, targets)
 
             transform = Matrix.Identity(4)
             for n in range(0, 4):
@@ -273,8 +273,8 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
             obj_source.matrix_world = transform @ obj_source.matrix_world
             global_functions.collect_garbage(context)
 
-        for o in objs_source:
-            o.select_set(True)
+        for obj in objs_source:
+            obj.select_set(True)
 
         context.view_layer.objects.active = objs_source[-1]
 

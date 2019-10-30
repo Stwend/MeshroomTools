@@ -10,7 +10,7 @@ bl_info = {
     "name": "Meshroom Tools",
     "category": "Object",
     "author": "Stefan Wendling",
-    "version": (0, 5, 0),
+    "version": (1, 0, 0),
     "blender": (2, 80, 0),
     }
 

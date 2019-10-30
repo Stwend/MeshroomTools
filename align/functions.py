@@ -30,7 +30,7 @@ def swap_vec3_format(vectors, swap_back = False):
     return swapped
 
 
-def affine_transform(points_source, points_target, iterations = 1, scale = True):
+def affine_transform(points_source, points_target, scale=True):
 
     S = swap_vec3_format(points_source)
     T = swap_vec3_format(points_target)
