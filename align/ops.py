@@ -172,8 +172,8 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
         found = False
         found2 = False
         for obj in context.selected_objects:
-            is_object = obj.get("AnchorGroup", False)
-            if not is_object:
+            is_object = obj.get("AnchorGroup", None)
+            if not is_object is None:
                 found = True
 
             is_locked = obj.get("AnchorsLocked", True)
@@ -231,7 +231,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
             for obj_target in obj_targets:
                 for anchor in context.view_layer.objects[obj_target['AnchorGroup']].children:
                     if not anchor['AnchorName'] == 'NONE':
-                        anchors_target.append(a)
+                        anchors_target.append(anchor)
 
             #process target anchors, unify duplicates
             anchors_target = functions.unify_targets(anchors_target, context)

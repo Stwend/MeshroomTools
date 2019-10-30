@@ -158,7 +158,7 @@ def align_mirrored(obj_source, self, context):
         self.report({'ERROR'}, "More than 3 mirrored or centered anchors are needed.")
         return {'CANCELLED'}
 
-    affine = affine_transform(avg[0], avg[1], 1, scale=False)
+    affine = affine_transform(avg[0], avg[1], 1)
 
     transform = Matrix.Identity(4)
     for n in range(0, 4):
