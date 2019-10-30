@@ -3,6 +3,15 @@
 A few useful tools for processing Meshroom scans inside Blender, loosely based on
 https://github.com/patmo141/object_alignment 
 
+##Table Of Contents
+- [MeshroomTools](#meshroomtools)
+  * [Import](#import)
+  * [UV/Texture](#uv-texture)
+  * [Align](#align)
+    * [Object Panel](#object-panel)
+    * [Anchor Panel](#anchor-panel)
+
+
 
 
 
@@ -71,7 +80,7 @@ If an object is selected, regardless of it having anchors or not, this panel app
 
 ##### Anchor Panel
 
-![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/align_active_anchor.PNG) 
 
 In case you have selected an anchor, this panel will show up.
 
@@ -83,7 +92,7 @@ In case you have selected an anchor, this panel will show up.
 
 
 
-![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor_pair.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/align_active_anchor_pair.PNG) 
 
 You can select a pair of anchors, too. In this case the anchor panel will show additional functions:
 
@@ -94,7 +103,7 @@ You can select a pair of anchors, too. In this case the anchor panel will show a
 
 
 
-![](https://github.com/Stwend/MeshroomTools/blob/master/align_active_anchor_pair_2.PNG) 
+![](https://github.com/Stwend/MeshroomTools/blob/master/__readme_img/align_active_anchor_pair_2.PNG) 
 
 This button will show up if you have selected two anchors and they belong to different objects.
 
