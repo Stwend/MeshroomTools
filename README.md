@@ -3,7 +3,7 @@
 A few useful tools for processing Meshroom scans inside Blender, loosely based on
 https://github.com/patmo141/object_alignment 
 
-##Table Of Contents
+## Table Of Contents
 - [MeshroomTools](#meshroomtools)
   * [Import](#import)
   * [UV/Texture](#uv-texture)
