@@ -179,8 +179,16 @@ def align_mirrored(obj_source, self):
     obj_source.rotation_mode = 'QUATERNION'
 
     anchors_source = []
+    try:
+        grp = context.view_layer.objects[obj_source['AnchorGroup']]
+    except:
+        pass
+        obj_source['AnchorGroup'] = ''
+        self.report({'ERROR'}, "More than 3 mirrored or centered anchors are needed.")
+        return {'CANCELLED'}
+        return
 
-    for a in context.view_layer.objects[obj_source['AnchorGroup']].children:
+    for a in grp.children:
         if not a.get('AnchorName', "NONE") == "NONE":
             anchors_source.append(a)
 

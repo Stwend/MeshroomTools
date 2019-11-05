@@ -84,7 +84,6 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
 
         except:
             self.generate_anchorgroup(context)
-            pass
 
 
         context.window_manager.modal_handler_add(self)
@@ -122,8 +121,8 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
 
         obj = context.object
 
-        group = context.object.get("AnchorGroup", None)
-        is_object = not group is None
+        group = context.object.get("AnchorGroup", '')
+        is_object = not group == ''
 
         if is_object:
             try:
@@ -249,8 +248,8 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
         found = False
         found2 = False
         for obj in context.selected_objects:
-            is_object = obj.get("AnchorGroup", None)
-            if not is_object is None:
+            is_object = obj.get("AnchorGroup", '')
+            if not is_object == '':
                 found = True
 
             is_locked = obj.get("AnchorsLocked", True)
@@ -281,14 +280,14 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
         objs_source = [o for o in context.selected_objects]
 
         for obj in objs_source:
-            if (obj.get("AnchorGroup", None) is None) or (obj.get("AnchorsLocked", True)):
+            if (obj.get("AnchorGroup", '') == '') or (obj.get("AnchorsLocked", True)):
                 objs_source.remove(obj)
 
         obj_targets = []
 
         for obj in context.view_layer.objects:
             if not obj.select_get():
-                if not obj.get("AnchorGroup", None) is None:
+                if not obj.get("AnchorGroup", '') == '':
                     if obj.get("AnchorsLocked", False):
                         obj_targets.append(obj)
 
@@ -311,7 +310,7 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
                         anchors_target.append(anchor)
 
             #process target anchors, unify duplicates
-            anchors_target = functions.unify_targets(anchors_target, context)
+            anchors_target = functions.unify_targets(anchors_target)
             anchors_combined = []
 
             for a in anchors_source:
@@ -376,8 +375,8 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
         f = False
         f2 = False
         for o in context.selected_objects:
-            x = o.get("AnchorGroup", None)
-            if not x is None:
+            x = o.get("AnchorGroup", '')
+            if not x == '':
                 f = True
 
             x = o.get("AnchorsLocked", True)
@@ -406,7 +405,7 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
         objs_source = [o for o in context.selected_objects]
 
         for o in objs_source:
-            if (o.get("AnchorGroup", None) is None) or (o.get("AnchorsLocked", True)):
+            if (o.get("AnchorGroup", '') == '') or (o.get("AnchorsLocked", True)):
                 objs_source.remove(o)
 
 
