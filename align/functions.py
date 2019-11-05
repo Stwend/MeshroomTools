@@ -205,6 +205,7 @@ def align_mirrored(obj_source, self):
     if not obj_prev_name is None:
         try:
             to_delete = context.view_layer.objects[obj_prev_name]
+            obj_source['MirrorPreview'] = ''
             global_functions.tag_garbage(to_delete)
         except:
             pass

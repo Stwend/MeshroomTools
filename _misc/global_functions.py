@@ -12,6 +12,7 @@ def collect_garbage(context):
     for obj in context.scene.objects:
         if obj.get("Meshroom_GARBAGE", False):
             obj.hide_set(False)
+            obj.hide_select = False
             obj.hide_viewport = False
             obj.select_set(True)
 

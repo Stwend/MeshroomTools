@@ -38,8 +38,11 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
 
         if isObject:
             toggle.append(obj)
-            for a in context.view_layer.objects[obj['AnchorGroup']].children:
+            try:
+                for a in context.view_layer.objects[obj['AnchorGroup']].children:
                     toggle.append(a)
+            except:
+                pass
 
         else:
             p = obj.parent.parent
@@ -108,11 +111,11 @@ class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
 
     def execute(self, context):
 
-        mirror = context.object.get("MirrorPreview", None)
+        mirror = context.object.get("MirrorPreview", '')
 
         is_anchor = context.object.get("AlignmentAnchor", False)
         is_object = not is_anchor and context.object.get("AnchorGroup", False)
-        is_mirrored = is_object and not mirror is None
+        is_mirrored = is_object and not mirror == ''
 
         if not (is_anchor or is_object):
             return {'FINISHED'}
@@ -123,8 +126,14 @@ class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
             if is_object:
                 unaffected = [context.object]
                 if is_mirrored:
-                    unaffected.append(context.view_layer.objects[mirror])
-                unaffected.extend(t for t in context.view_layer.objects[context.object["AnchorGroup"]].children)
+                    try:
+                        unaffected.append(context.view_layer.objects[mirror])
+                    except:
+                        pass
+                try:
+                    unaffected.extend(t for t in context.view_layer.objects[context.object["AnchorGroup"]].children)
+                except:
+                    pass
             else:
                 p = context.object.parent.parent
                 unaffected = [p]

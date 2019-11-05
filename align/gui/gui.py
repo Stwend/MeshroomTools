@@ -39,9 +39,7 @@ class RENDER_PT_MRAlignPanel(Panel):
             rowOpt = spl.row()
             rowOpt.alignment = "RIGHT"
             rowOpt.operator("mr.togglelockbtn", text="", icon=("LOCKED" if isLocked else "UNLOCKED"), emboss=False)
-            if isHaveMirror:
-                rowOpt.operator("mr.togglepreviewbtn", text="", icon="HIDE_ON" if isMirrorHidden else "HIDE_OFF", emboss=False)
-            op_isolate = rowOpt.operator("mr.selectbtn", text="", icon="MESH_CUBE" if not isAnchor else "EMPTY_AXIS", emboss=False)
+            op_isolate = rowOpt.operator("mr.selectbtn", text="", icon="OBJECT_DATAMODE" if not isAnchor else "EMPTY_AXIS", emboss=False)
             op_isolate.mode = 0
 
             if not isAnchor:
@@ -56,8 +54,17 @@ class RENDER_PT_MRAlignPanel(Panel):
                     mainColumn.operator("mr.addanchor", text="Add Anchor")
 
                     mainColumn.separator()
+                    mainColumn.separator()
+
                     mainColumn.label(text="Mirror")
-                    mainColumn.prop(context.scene, "mr_mirror_preview", text="Preview")
+                    rowMirror = mainColumn.row()
+                    spl = rowMirror.split(factor=0.5)
+                    rowLeft, rowRight = spl.row(), spl.row()
+                    rowRight.alignment = "RIGHT"
+                    rowLeft.prop(context.scene, "mr_mirror_preview", text="Preview")
+                    if isHaveMirror:
+                        rowRight.operator("mr.togglepreviewbtn", text="", icon="HIDE_ON" if isMirrorHidden else "HIDE_OFF", emboss=False)
+                        rowRight.operator("mr.deletepreview", text="", icon="PANEL_CLOSE", emboss=False)
                     mainColumn.operator("mr.alignmirrored", text="Align Mirrored")
                     mainColumn.separator()
                     mainColumn.label(text="Align")
@@ -96,8 +103,9 @@ class RENDER_PT_MRAlignPanel(Panel):
                             r_copy_s.prop(context.scene, "mr_mirror_translate", text="Location")
                             cop = r_copy_s.operator("mr.linkbtn", text="Copy Mirrored", icon="PASTEDOWN")
                             cop.mirror = True
-                    r_mirror = mainColumn.row()
-                    r_mirror.operator("mr.mirroranchor", text="Mirror")
+                    elif len(context.selected_objects) == 1:
+                        r_mirror = mainColumn.row()
+                        r_mirror.operator("mr.mirroranchor", text="Mirror")
 
         else:
             layout.active = False

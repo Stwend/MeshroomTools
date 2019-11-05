@@ -126,12 +126,14 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
         is_object = not group is None
 
         if is_object:
+            try:
+                grp = context.view_layer.objects[group]
+                global_functions.tag_garbage(grp)
 
-            grp = context.view_layer.objects[group]
-            global_functions.tag_garbage(grp)
-
-            for anchor in grp.children:
-                global_functions.tag_garbage(anchor)
+                for anchor in grp.children:
+                    global_functions.tag_garbage(anchor)
+            except:
+                pass
 
             global_functions.collect_garbage(context)
 
@@ -194,6 +196,33 @@ class OBJECT_OT_MRAnchorCreateMirrored(bpy.types.Operator):
             global_functions.collect_garbage(context)
 
             functions.add_anchor(obj.parent, pos, name=name, side=abs(side-2), locked=is_locked)
+
+        return {'FINISHED'}
+
+class OBJECT_OT_MRRemoveMirrorPreview(bpy.types.Operator):
+
+    bl_idname = "mr.deletepreview"
+    bl_label = ""
+
+    def execute(self, context):
+
+        global_functions.store(context)
+
+        obj = context.object
+        mirror = obj.get('MirrorPreview', '')
+
+        if not mirror is '':
+            try:
+                target = context.view_layer.objects[mirror]
+                global_functions.tag_garbage(target)
+                global_functions.collect_garbage(context)
+            except:
+                pass
+
+            obj['MirrorPreview'] = ''
+
+        obj.select_set(True)
+        context.view_layer.objects.active = obj
 
         return {'FINISHED'}
 
