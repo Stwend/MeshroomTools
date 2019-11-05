@@ -5,6 +5,34 @@ import numpy as np
 from .._misc import global_functions, external
 from .classes import Bucket, BucketItem
 
+def add_anchor(grp, pos, name='NONE', side=1, locked=False):
+
+    context = global_functions.ctx()
+
+    bpy.ops.object.empty_add(type='PLAIN_AXES', radius=1.0, align='WORLD', location=(0.0, 0.0, 0.0),
+                             rotation=(0.0, 0.0, 0.0))
+
+    target = context.view_layer.objects.active
+    target.select_set(False)
+
+    # initialize empty properties
+    target.name = "New Anchor"
+    target['AlignmentAnchor'] = True
+    target['AnchorName'] = name
+    target['AnchorSide'] = side
+    target['AnchorsLocked'] = locked
+
+    target.parent = grp
+    target.matrix_world = Matrix.Translation(pos)
+
+    target.lock_location = (locked, locked, locked)
+    target.lock_rotation = (locked, locked, locked)
+    target.lock_scale = (locked, locked, locked)
+
+    context.view_layer.objects.active = target
+    target.select_set(True)
+
+
 def swap_vec3_format(vectors, swap_back = False):
 
     if swap_back:
@@ -40,7 +68,9 @@ def affine_transform(points_source, points_target, scale=True):
     return M
 
 
-def unify_targets(target_objects, context):
+def unify_targets(target_objects):
+
+    context = global_functions.ctx()
 
     buckets = []
 
@@ -93,7 +123,7 @@ def unify_targets(target_objects, context):
 
 
 
-def average_anchors(anchors, context):
+def average_anchors(anchors):
     buckets = []
 
     loc_old = []
@@ -142,7 +172,9 @@ def average_anchors(anchors, context):
 
 
 
-def align_mirrored(obj_source, self, context):
+def align_mirrored(obj_source, self):
+
+    context = global_functions.ctx()
 
     obj_source.rotation_mode = 'QUATERNION'
 
@@ -152,13 +184,13 @@ def align_mirrored(obj_source, self, context):
         if not a.get('AnchorName', "NONE") == "NONE":
             anchors_source.append(a)
 
-    avg = average_anchors(anchors_source, context)
+    avg = average_anchors(anchors_source)
 
     if len(avg[0]) < 3:
         self.report({'ERROR'}, "More than 3 mirrored or centered anchors are needed.")
         return {'CANCELLED'}
 
-    affine = affine_transform(avg[0], avg[1], 1)
+    affine = affine_transform(avg[0], avg[1])
 
     transform = Matrix.Identity(4)
     for n in range(0, 4):
@@ -186,14 +218,12 @@ def align_mirrored(obj_source, self, context):
         bpy.ops.object.duplicate({"object": obj_source, "selected_objects": [obj_source]}, linked=False)
         obj_prev = context.object
         obj_source['MirrorPreview'] = obj_prev.name
+        obj_prev['MirrorParent'] = obj_source.name
         bpy.ops.object.transform_apply({"object": obj_prev, "selected_objects": [obj_prev]}, location=True, rotation=True, scale=True)
         obj_prev.scale.x = -1.0
         obj_prev.select_set(False)
+        obj_prev.hide_select = True
         obj_source["MirrorHidden"] = False
-
-
-
-
 
     context.view_layer.objects.active = obj_source
     obj_source.select_set(True)

@@ -108,17 +108,22 @@ class OBJECT_OT_MRSelectBtn(bpy.types.Operator):
 
     def execute(self, context):
 
-        isAnchor = context.object.get("AlignmentAnchor", False)
-        isObject = not isAnchor and context.object.get("AnchorGroup", False)
+        mirror = context.object.get("MirrorPreview", None)
 
-        if not (isAnchor or isObject):
+        is_anchor = context.object.get("AlignmentAnchor", False)
+        is_object = not is_anchor and context.object.get("AnchorGroup", False)
+        is_mirrored = is_object and not mirror is None
+
+        if not (is_anchor or is_object):
             return {'FINISHED'}
 
         #Select Group
         if self.mode == 0:
 
-            if isObject:
+            if is_object:
                 unaffected = [context.object]
+                if is_mirrored:
+                    unaffected.append(context.view_layer.objects[mirror])
                 unaffected.extend(t for t in context.view_layer.objects[context.object["AnchorGroup"]].children)
             else:
                 p = context.object.parent.parent

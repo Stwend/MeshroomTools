@@ -38,25 +38,9 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
 
             if ray_info[0]:
                 #add empty as pivot
-                bpy.ops.object.empty_add(type='PLAIN_AXES', radius=1.0, align='WORLD', location=(0.0, 0.0, 0.0), rotation=(0.0, 0.0, 0.0))
-
-                target = context.view_layer.objects.active
-                target.select_set(False)
-
-
-                #initialize empty properties
-                target.name = "New Anchor"
-                target['AlignmentAnchor'] = True
-                target['AnchorName'] = "NONE"
-                target['AnchorSide'] = 1
-                target['AnchorsLocked'] = False
-
                 loc = ray_info[1] @ m + self.parent.location
-                target.parent = self.grp
-                target.matrix_world = Matrix.Translation(loc)
 
-                target.lock_rotation = (True, True, True)
-                target.lock_scale = (True, True, True)
+                functions.add_anchor(self.grp, loc)
 
                 #reset selection
                 context.view_layer.objects.active = self.parent
@@ -71,6 +55,8 @@ class OBJECT_OT_MRAnchorAddModal(bpy.types.Operator):
 
 
     def invoke(self, context, event):
+
+        global_functions.store(context)
 
         len_ok = len(context.selected_objects) == 1
         mesh_ok = context.object.type == 'MESH'
@@ -154,6 +140,66 @@ class OBJECT_OT_MRAnchorClear(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class OBJECT_OT_MRAnchorRemove(bpy.types.Operator):
+
+    bl_idname = "mr.removeanchor"
+    bl_label = ""
+
+    def execute(self, context):
+
+        global_functions.store(context)
+
+        obj = context.object
+        is_anchor = bool(obj.get('AlignmentAnchor', False))
+
+        if is_anchor:
+
+            grp = obj.parent
+
+            if len(grp.children) < 2:
+                global_functions.tag_garbage(grp)
+
+            global_functions.tag_garbage(obj)
+
+            global_functions.collect_garbage(context)
+
+        return {'FINISHED'}
+
+class OBJECT_OT_MRAnchorCreateMirrored(bpy.types.Operator):
+
+    bl_idname = "mr.mirroranchor"
+    bl_label = ""
+
+    def execute(self, context):
+
+        global_functions.store(context)
+
+        obj = context.object
+        is_anchor = bool(obj.get('AlignmentAnchor', False))
+
+        if is_anchor:
+
+            pos = obj.matrix_world.translation.copy()
+            pos.x *= -1
+
+            is_locked = obj.get('AnchorLocked', False)
+            side = obj.get('AnchorSide', 1)
+            name = obj.get('AnchorName', 'NONE')
+
+            for a in obj.parent.children:
+                if a.get('AnchorSide', 1) == abs(side - 2) and a.get('AnchorName', 'NONE') == name:
+                    global_functions.tag_garbage(a)
+                    break
+
+            global_functions.collect_garbage(context)
+
+            functions.add_anchor(obj.parent, pos, name=name, side=abs(side-2), locked=is_locked)
+
+        return {'FINISHED'}
+
+
+
+
 
 class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
 
@@ -161,6 +207,8 @@ class OBJECT_OT_MRAnchorAlign(bpy.types.Operator):
     bl_label = "Align Anchors"
 
     def execute(self, context):
+
+        global_functions.store(context)
 
         if len(context.selected_objects) == 0:
             self.report({'ERROR'}, "No mesh objects selected.")
@@ -288,6 +336,8 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
 
     def execute(self, context):
 
+        global_functions.store(context)
+
         if len(context.selected_objects) == 0:
             self.report({'ERROR'}, "No mesh objects selected.")
             return {'CANCELLED'}
@@ -333,7 +383,7 @@ class OBJECT_OT_MRAlignMirrored(bpy.types.Operator):
 
         for obj_source in objs_source:
 
-            functions.align_mirrored(obj_source, self, context)
+            functions.align_mirrored(obj_source, self)
 
         return {'FINISHED'}
 

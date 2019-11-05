@@ -50,8 +50,10 @@ class RENDER_PT_MRAlignPanel(Panel):
                     mainColumn.label(text="OBJECT LOCKED")
 
                 else:
+
+                    rowOpt.operator("mr.clearanchors", text="", icon="PANEL_CLOSE", emboss=False)
+
                     mainColumn.operator("mr.addanchor", text="Add Anchor")
-                    mainColumn.operator("mr.clearanchors", text="Clear Anchors")
 
                     mainColumn.separator()
                     mainColumn.label(text="Mirror")
@@ -68,6 +70,8 @@ class RENDER_PT_MRAlignPanel(Panel):
                 if isLocked:
                     mainColumn.label(text="ANCHOR LOCKED")
                 else:
+
+                    rowOpt.operator("mr.removeanchor", text="", icon="PANEL_CLOSE", emboss=False)
 
                     s = context.object.get("AnchorSide", 1)
 
@@ -92,6 +96,8 @@ class RENDER_PT_MRAlignPanel(Panel):
                             r_copy_s.prop(context.scene, "mr_mirror_translate", text="Location")
                             cop = r_copy_s.operator("mr.linkbtn", text="Copy Mirrored", icon="PASTEDOWN")
                             cop.mirror = True
+                    r_mirror = mainColumn.row()
+                    r_mirror.operator("mr.mirroranchor", text="Mirror")
 
         else:
             layout.active = False
