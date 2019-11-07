@@ -5,7 +5,8 @@ import numpy as np
 from .._misc import global_functions, external
 from .classes import Bucket, BucketItem
 
-def add_anchor(grp, pos, name='NONE', side=1, locked=False):
+
+def add_anchor(grp, pos, name='NONE', side=1, locked=False, select=True):
 
     context = global_functions.ctx()
 
@@ -29,11 +30,12 @@ def add_anchor(grp, pos, name='NONE', side=1, locked=False):
     target.lock_rotation = (locked, locked, locked)
     target.lock_scale = (locked, locked, locked)
 
-    context.view_layer.objects.active = target
-    target.select_set(True)
+    if select:
+        context.view_layer.objects.active = target
+    target.select_set(select)
 
 
-def swap_vec3_format(vectors, swap_back = False):
+def swap_vec3_format(vectors, swap_back=False):
 
     if swap_back:
 
@@ -41,11 +43,10 @@ def swap_vec3_format(vectors, swap_back = False):
 
         for i in range(0, len(vectors[0])):
 
-            vec = np.zeros(shape=[4,1])
+            vec = np.zeros(shape=[4, 1])
             vec[0], vec[1], vec[2] = vectors[0][i], vectors[1][i], vectors[2][i]
             vec[3] = 1
             swapped.append(vec)
-
 
     else:
         swapped = np.zeros(shape=[3, len(vectors)])
@@ -60,12 +61,12 @@ def swap_vec3_format(vectors, swap_back = False):
 
 def affine_transform(points_source, points_target, scale=True):
 
-    S = swap_vec3_format(points_source)
-    T = swap_vec3_format(points_target)
+    s = swap_vec3_format(points_source)
+    t = swap_vec3_format(points_target)
 
-    M = external.affine_matrix_from_points(S, T, shear=False, scale=scale, usesvd=True)
+    m = external.affine_matrix_from_points(s, t, shear=False, scale=scale, usesvd=True)
 
-    return M
+    return m
 
 
 def unify_targets(target_objects):
@@ -120,9 +121,6 @@ def unify_targets(target_objects):
     return target2
 
 
-
-
-
 def average_anchors(anchors):
     buckets = []
 
@@ -157,19 +155,18 @@ def average_anchors(anchors):
             if not len(b.items) < 2:
                 p1, p2 = b.items[0].value.matrix_world.translation,  b.items[1].value.matrix_world.translation
 
-                p1M, p2M = p1.copy(), p2.copy()
+                p1m, p2m = p1.copy(), p2.copy()
 
-                p1M.x = -p1M.x
-                p2M.x = -p2M.x
+                p1m.x = -p1m.x
+                p2m.x = -p2m.x
 
-                p1New = (p1 + p2M) / 2
-                p2New = (p2 + p1M) / 2
+                p1_new = (p1 + p2m) / 2
+                p2_new = (p2 + p1m) / 2
 
-                loc.extend([p1New, p2New])
+                loc.extend([p1_new, p2_new])
                 loc_old.extend([p1,p2])
 
     return [loc_old,loc]
-
 
 
 def align_mirrored(obj_source, self):
@@ -186,7 +183,6 @@ def align_mirrored(obj_source, self):
         obj_source['AnchorGroup'] = ''
         self.report({'ERROR'}, "More than 3 mirrored or centered anchors are needed.")
         return {'CANCELLED'}
-        return
 
     for a in grp.children:
         if not a.get('AnchorName', "NONE") == "NONE":
@@ -207,8 +203,6 @@ def align_mirrored(obj_source, self):
 
     obj_source.matrix_world = transform @ obj_source.matrix_world
 
-
-
     obj_prev_name = obj_source.get('MirrorPreview', None)
     if not obj_prev_name is None:
         try:
@@ -218,7 +212,7 @@ def align_mirrored(obj_source, self):
         except:
             pass
 
-    global_functions.collect_garbage(context)
+    global_functions.collect_garbage()
 
     if(context.scene.mr_mirror_preview):
 
@@ -236,26 +230,3 @@ def align_mirrored(obj_source, self):
 
     context.view_layer.objects.active = obj_source
     obj_source.select_set(True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

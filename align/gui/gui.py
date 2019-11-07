@@ -18,6 +18,7 @@ class RENDER_PT_MRAlignPanel(Panel):
         if not context.object is None:
             isSelected = context.object.select_get()
             isLocked = context.object.get("AnchorsLocked", False)
+            isFavd = context.object.get("AnchorFav", False)
             isAnchor = context.object.get("AlignmentAnchor", False)
             isObject = not isAnchor and context.object.get("AnchorGroup", False)
             isHaveMirror = isObject and context.object.get("MirrorPreview", False)
@@ -78,6 +79,7 @@ class RENDER_PT_MRAlignPanel(Panel):
                     mainColumn.label(text="ANCHOR LOCKED")
                 else:
 
+                    rowOpt.operator("mr.togglefavbtn", text="", icon=("SOLO_ON" if isFavd else "SOLO_OFF"), emboss=False)
                     rowOpt.operator("mr.removeanchor", text="", icon="PANEL_CLOSE", emboss=False)
 
                     s = context.object.get("AnchorSide", 1)

@@ -5,7 +5,9 @@ storedContext = None
 def tag_garbage(obj):
     obj["Meshroom_GARBAGE"] = True
 
-def collect_garbage(context):
+def collect_garbage():
+
+    context = ctx()
 
     bpy.ops.object.select_all(action='DESELECT')
 
