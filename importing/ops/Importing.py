@@ -28,22 +28,25 @@ class OBJECT_OT_MRimport(bpy.types.Operator):
         mesh_empty = mesh_files is None or len(mesh_files) == 0
 
         prefer_tex = context.scene.mr_import_textured
+        prefer_mesh = context.scene.mr_import_mesh
+        prefer_same = prefer_tex == prefer_mesh
 
-        pick_textured = prefer_tex and not tex_empty
-        pick_mesh = not pick_textured and not mesh_empty
+        pick_textured = (not prefer_mesh or prefer_same) and not tex_empty
+        pick_mesh = (not prefer_tex or prefer_same) and not mesh_empty
+
+        print("Pick Mesh: " + str(pick_mesh))
+        print("Pick Tex: " + str(pick_textured))
 
         files_full = []
 
-        file = r'texturedMesh.obj'
+        if pick_textured:
 
-        for f in tex_files:
-            full_path = os.path.join(tex_path, f, file)
-            if os.path.isfile(full_path):
-                files_full.append(full_path)
+            file = r'texturedMesh.obj'
 
-        if len(files_full) == 0:
-            pick_textured = False
-            pick_mesh = not mesh_empty
+            for f in tex_files:
+                full_path = os.path.join(tex_path, f, file)
+                if os.path.isfile(full_path):
+                    files_full.append(full_path)
 
         if pick_mesh:
 
@@ -55,10 +58,7 @@ class OBJECT_OT_MRimport(bpy.types.Operator):
                 if os.path.isfile(full_path):
                     files_full.append(full_path)
 
-            if len(files_full) == 0:
-                pick_mesh = False
-
-        if not (pick_textured or pick_mesh):
+        if len(files_full) == 0:
             self.report({'ERROR'}, "No geometry found.")
             return {'CANCELLED'}
 

@@ -13,5 +13,6 @@ class RENDER_PT_MRImportPanel(Panel):
         box = layout.split(factor=0.33)
         box.label(text="Project:")
         box.prop(context.scene, "mr_import_path", text="")
+        layout.prop(context.scene, "mr_import_mesh", text="Prefer Mesh")
         layout.prop(context.scene, "mr_import_textured", text="Prefer Textured")
         layout.operator("mr.importing", text="Import")
