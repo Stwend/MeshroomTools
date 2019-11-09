@@ -1,8 +1,8 @@
-from . import functions, ops, gui
+from . import functions, gui, ops
 
 
 def get_to_register():
 
-    ret = [ops.OBJECT_OT_MRuvpack]
+    ret = gui.get_to_register()
     ret.extend(gui.get_to_register())
     return ret
