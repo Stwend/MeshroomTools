@@ -23,4 +23,3 @@ def initialize_props():
     #Import
     bpy.types.Scene.mr_import_path = bpy.props.StringProperty(default="", subtype="FILE_PATH")
     bpy.types.Scene.mr_import_textured = bpy.props.BoolProperty(default=True)
-    bpy.types.Scene.mr_import_mesh = bpy.props.BoolProperty(default=True)

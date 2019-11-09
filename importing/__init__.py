@@ -1,8 +1,8 @@
-from . import ops, gui
+from . import gui, ops
 
 
 def get_to_register():
 
-    ret = [ops.OBJECT_OT_MRimport]
+    ret = ops.get_to_register()
     ret.extend(gui.get_to_register())
     return ret
