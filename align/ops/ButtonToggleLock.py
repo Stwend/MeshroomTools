@@ -40,5 +40,6 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
             obj.lock_location = (desired_lock_state, desired_lock_state, desired_lock_state)
             obj.lock_rotation = (desired_lock_state, desired_lock_state, desired_lock_state)
             obj.lock_scale = (desired_lock_state, desired_lock_state, desired_lock_state)
+            obj.hide_select = desired_lock_state
 
         return {'FINISHED'}

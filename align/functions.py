@@ -3,7 +3,7 @@ from mathutils import Vector, Matrix
 import numpy as np
 
 from .._misc import global_functions, external
-from .classes import Bucket, BucketItem
+from .classes import Bucket, BucketItem, AnchorProxy
 
 
 def add_anchor(grp, pos, name='NONE', side=1, locked=False, select=True):
@@ -33,6 +33,8 @@ def add_anchor(grp, pos, name='NONE', side=1, locked=False, select=True):
     if select:
         context.view_layer.objects.active = target
     target.select_set(select)
+
+    return target
 
 
 def swap_vec3_format(vectors, swap_back=False):
@@ -77,22 +79,18 @@ def unify_targets(target_objects):
 
     for anchor in target_objects:
 
-        x = BucketItem(anchor)
-        n = anchor.get("AnchorName")
-        s = anchor.get("AnchorSide")
-
         if len(buckets) == 0:
-            buckets.append(Bucket(n, s, x))
+            buckets.append(Bucket(anchor.name, anchor.side, BucketItem(anchor)))
             continue
 
         for b in buckets:
-            if b.name == n and b.side == s:
-                b.items.append(x)
+            if b.name == anchor.name and b.side == anchor.side:
+                b.items.append(BucketItem(anchor))
                 continue
 
-        buckets.append(Bucket(n, s, x))
+        buckets.append(Bucket(anchor.name, anchor.side, BucketItem(anchor)))
 
-    target2 = []
+    proxies = []
 
     for b in buckets:
 
@@ -101,24 +99,16 @@ def unify_targets(target_objects):
 
         for val in b.items:
 
-            total_loc += val.value.matrix_world.translation
+            total_loc += val.value.matrix.translation
             total_weight += 1
 
         if not total_weight == 0:
             total_loc /= total_weight
 
-        bpy.ops.object.empty_add(type='PLAIN_AXES', radius=1.0, align='WORLD', location=total_loc,
-                                 rotation=(0.0, 0.0, 0.0))
-        temp = context.view_layer.objects.active
+        proxies.append(AnchorProxy(fav=False, lock=True, name=b.name, side=b.side, matrix=Matrix.Translation(total_loc)))
 
-        temp["AnchorName"] = b.name
-        temp["AnchorSide"] = b.side
 
-        global_functions.tag_garbage(temp)
-
-        target2.append(temp)
-
-    return target2
+    return proxies
 
 
 def average_anchors(anchors):

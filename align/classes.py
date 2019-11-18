@@ -19,13 +19,22 @@ class BucketItem:
 
 
 class AnchorProxy:
-    def __init__(self, obj):
-        if bool(obj.get('AlignmentAnchor', False)):
-            self.source = obj
-            self.fav = bool(obj.get('AnchorFav', False))
-            self.lock = bool(obj.get('AnchorLocked', False))
-            self.name = obj.get('AnchorName', 'NONE')
-            self.side = obj.get('AnchorSide', 1)
+    def __init__(self, obj=None, fav=None, lock=None, name=None, side=None, matrix=None):
+        if not obj is None:
+            if bool(obj.get('AlignmentAnchor', False)):
+                #self.source = obj
+                self.fav = bool(obj.get('AnchorFav', False))
+                self.lock = bool(obj.get('AnchorLocked', False))
+                self.name = obj.get('AnchorName', 'NONE')
+                self.side = obj.get('AnchorSide', 1)
+                self.matrix = obj.matrix_world
+        else:
+            self.fav = fav
+            self.lock = lock
+            self.name = name
+            self.side = side
+            self.matrix = matrix
+
 
 
 class AnchorObjectProxy:
@@ -182,7 +191,11 @@ class AnchorSceneProxy:
 
             is_valid = (is_valid and not is_empty) or is_anchor
 
-            is_locked = bool(obj.get('AnchorLocked', False))
+            if is_anchor:
+                is_locked = bool(obj.get('AnchorLocked', False))
+            else:
+                is_locked = bool(obj.get('AnchorsLocked', False))
+            print(is_locked)
 
             if is_anchor and is_active:
                 obj_target = obj.parent.parent

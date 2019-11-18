@@ -27,6 +27,8 @@ class OBJECT_OT_MRAnchorAlign(OBJECT_OT_MRAlignBaseOperator):
         anchors_source = self.data.active.anchors
         anchors_target = []
 
+        print(self.data.locked)
+
         for obj_proxy in self.data.locked:
             anchors_target.extend(obj_proxy.anchors)
 
@@ -53,8 +55,8 @@ class OBJECT_OT_MRAnchorAlign(OBJECT_OT_MRAlignBaseOperator):
         for i in range(0, l):
 
             #transform into source space
-            sources.append(anchors_combined[i][0].matrix_world.translation)
-            targets.append(anchors_combined[i][1].matrix_world.translation)
+            sources.append(anchors_combined[i][0].matrix.translation)
+            targets.append(anchors_combined[i][1].matrix.translation)
 
         affine = functions.affine_transform(sources, targets)
 

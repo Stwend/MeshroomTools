@@ -1,7 +1,7 @@
 import bpy
 
-from texture import functions
-from _misc import global_functions
+from .. import functions
+from ..._misc import global_functions
 
 
 class OBJECT_OT_MRuvpack(bpy.types.Operator):

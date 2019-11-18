@@ -1,7 +1,5 @@
 import bpy
 
-
-
 from . import texture, align, _misc, importing
 
 
