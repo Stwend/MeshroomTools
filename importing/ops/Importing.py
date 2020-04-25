@@ -9,8 +9,8 @@ class OBJECT_OT_MRimport(bpy.types.Operator):
 
     def execute(self, context):
 
-        tex_path = r'MeshroomCache\Texturing'
-        mesh_path = r'MeshroomCache\Meshing'
+        tex_path = r'MeshroomCache/Texturing'
+        mesh_path = r'MeshroomCache/Meshing'
 
         pre_path = os.path.dirname(context.scene.mr_import_path)
 
