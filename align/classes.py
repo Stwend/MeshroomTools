@@ -22,7 +22,7 @@ class AnchorProxy:
     def __init__(self, obj=None, fav=None, lock=None, name=None, side=None, matrix=None):
         if not obj is None:
             if bool(obj.get('AlignmentAnchor', False)):
-                #self.source = obj
+                self.source = obj
                 self.fav = bool(obj.get('AnchorFav', False))
                 self.lock = bool(obj.get('AnchorLocked', False))
                 self.name = obj.get('AnchorName', 'NONE')
@@ -38,7 +38,7 @@ class AnchorProxy:
 
 
 class AnchorObjectProxy:
-    def __init__(self, obj):
+    def __init__(self, obj=None):
 
         context = global_functions.ctx()
 
@@ -122,6 +122,7 @@ class AnchorObjectProxy:
 
         if not keep_grp:
             global_functions.tag_garbage(self.grp)
+            self.source['AnchorGroup'] = ''
 
         global_functions.collect_garbage()
         self.focus()
@@ -138,6 +139,7 @@ class AnchorObjectProxy:
 
         if len(self.grp.children) == 1 and found:
             global_functions.tag_garbage(self.grp)
+            self.source['AnchorGroup'] = ''
 
         global_functions.collect_garbage()
         self.focus()

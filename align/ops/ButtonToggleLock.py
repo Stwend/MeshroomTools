@@ -26,6 +26,7 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
             try:
                 for a in context.view_layer.objects[obj['AnchorGroup']].children:
                     toggle.append(a)
+                    a.hide_select = desired_lock_state
             except:
                 pass
 
@@ -34,12 +35,13 @@ class OBJECT_OT_MRToggleLockBtn(bpy.types.Operator):
             toggle.append(p)
             for a in context.view_layer.objects[p['AnchorGroup']].children:
                     toggle.append(a)
+                    a.hide_select = desired_lock_state
 
         for obj in toggle:
             obj['AnchorsLocked'] = desired_lock_state
             obj.lock_location = (desired_lock_state, desired_lock_state, desired_lock_state)
             obj.lock_rotation = (desired_lock_state, desired_lock_state, desired_lock_state)
             obj.lock_scale = (desired_lock_state, desired_lock_state, desired_lock_state)
-            obj.hide_select = desired_lock_state
+            #obj.hide_select = desired_lock_state
 
         return {'FINISHED'}

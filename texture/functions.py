@@ -110,22 +110,34 @@ def packUDIMS(selObj):
 
         obj.data.materials.append(m)
 
-    engine = ctx.scene.render.engine
+    rnd_eng = ctx.scene.render.engine
+    rnd_path = ctx.scene.render.filepath
+    rnd_comp = ctx.scene.render.use_compositing
+    rnd_seq = ctx.scene.render.use_sequencer
+    shd_col = ctx.scene.display.shading.color_type
+    shd_l = ctx.scene.display.shading.light
+
+
+
     ctx.scene.render.engine = "BLENDER_WORKBENCH"
+    ctx.scene.render.use_compositing = False
+    ctx.scene.render.use_sequencer = False
+    ctx.scene.render.filepath = path
 
-
-    color = ctx.scene.display.shading.color_type
     ctx.scene.display.shading.color_type = "TEXTURE"
-
-    light = ctx.scene.display.shading.light
     ctx.scene.display.shading.light = "FLAT"
 
-    ctx.scene.render.filepath = path
+    ctx.scene.view_settings.view_transform = "Standard"
+
     bpy.ops.render.render(write_still=True)
 
-    ctx.scene.render.engine = engine
-    ctx.scene.display.shading.color_type = color
-    ctx.scene.display.shading.light = light
+    ctx.scene.render.engine = rnd_eng
+    ctx.scene.render.filepath = rnd_path
+    ctx.scene.render.use_compositing = rnd_comp
+    ctx.scene.render.use_sequencer = rnd_seq
+    ctx.scene.display.shading.color_type = shd_col
+    ctx.scene.display.shading.light = shd_l
+
 
 
     m = bpy.data.materials.new(name="packed")

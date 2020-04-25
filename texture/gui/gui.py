@@ -13,7 +13,9 @@ class RENDER_PT_MRUVPanel(Panel):
         layout = self.layout
 
         if not context.object is None and len( context.object.material_slots) > 0:
-            is_valid = context.object.material_slots[0].name == 'TextureAtlas_1001'
+            name_to_test = context.object.material_slots[0].name
+            name_to_test = name_to_test.rsplit('.')[0]
+            is_valid = name_to_test == 'TextureAtlas_1001'
         else:
             is_valid = False
 

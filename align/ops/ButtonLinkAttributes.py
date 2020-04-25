@@ -8,6 +8,7 @@ class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     mirror = bpy.props.BoolProperty(default=False)
+    translate = bpy.props.BoolProperty(default=False)
 
     def execute(self, context):
 
@@ -16,7 +17,7 @@ class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
         target = context.object
 
         for s in sel:
-            if s.get("AlignmentAnchor", False):
+            if s.get("AlignmentAnchor", False) and not s.name == target.name:
                 source = s
                 break
 
@@ -31,7 +32,7 @@ class OBJECT_OT_MRLinkAttrsBtn(bpy.types.Operator):
         else:
             target["AnchorSide"] = abs(source["AnchorSide"] - 2)
 
-        if context.scene.mr_mirror_translate:
+        if self.translate:
             temp = source.matrix_world.translation.copy()
             temp.x = -temp.x
             target.matrix_world.translation = temp
