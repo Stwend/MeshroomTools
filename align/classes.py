@@ -132,7 +132,7 @@ class AnchorObjectProxy:
         found = False
 
         for anchor in self.anchors:
-            if anchor.source.name == target_anchor.source.name:
+            if anchor.source.name == target_anchor.name:
                 global_functions.tag_garbage(anchor.source)
                 found = True
                 break

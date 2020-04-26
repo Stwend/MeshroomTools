@@ -9,8 +9,8 @@ class OBJECT_OT_MRimport(bpy.types.Operator):
 
     def execute(self, context):
 
-        tex_path = r'MeshroomCache/Texturing'
-        mesh_path = r'MeshroomCache/Meshing'
+        tex_path = os.path.join('MeshroomCache','Texturing')
+        mesh_path = os.path.join('MeshroomCache','Meshing')
 
         pre_path = os.path.dirname(context.scene.mr_import_path)
 
@@ -47,6 +47,7 @@ class OBJECT_OT_MRimport(bpy.types.Operator):
                 full_path = os.path.join(tex_path, f, file)
                 if os.path.isfile(full_path):
                     files_full.append(full_path)
+
 
         if pick_mesh:
 

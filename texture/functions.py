@@ -82,10 +82,15 @@ def packUDIMS(selObj):
         bpy.ops.object.material_slot_select()
         bpy.ops.object.material_slot_remove()
 
+    prev_cam = ctx.scene.camera
+    resx = ctx.scene.render.resolution_x
+    resy = ctx.scene.render.resolution_y
+    perc = ctx.scene.render.resolution_percentage
+
     bpy.ops.object.camera_add(enter_editmode=False, location=(0.0, 0.0, 1), rotation=(0.0, 0.0, 0.0))
+    cam = ctx.view_layer.objects.active
 
-    cam = ctx.scene.camera
-
+    ctx.scene.camera = cam
     cam.data.ortho_scale = 1.
     cam.data.show_background_images = True
     cam.data.type = "ORTHO"
@@ -104,7 +109,7 @@ def packUDIMS(selObj):
         y = placement[i][1] + 0.5 * scale - .5
 
         bpy.ops.mesh.primitive_plane_add(size=scale, calc_uvs=True, enter_editmode=False, location=(x, y, 0.0), rotation=(0.0, 0.0, 0.0))
-        obj = ctx.object
+        obj = ctx.view_layer.objects.active
 
         bin.append(obj)
 
@@ -138,7 +143,10 @@ def packUDIMS(selObj):
     ctx.scene.display.shading.color_type = shd_col
     ctx.scene.display.shading.light = shd_l
 
-
+    ctx.scene.camera = prev_cam
+    ctx.scene.render.resolution_x = resx
+    ctx.scene.render.resolution_y = resy
+    ctx.scene.render.resolution_percentage = perc
 
     m = bpy.data.materials.new(name="packed")
     m.use_nodes = True
